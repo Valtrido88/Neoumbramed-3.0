@@ -85,7 +85,7 @@ const DEMO_DATA = [
  * Generate a unique ID for demo records
  */
 function generateId() {
-    return 'rec' + Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+    return 'rec' + Date.now().toString(36) + Math.random().toString(36).substring(2, 7);
 }
 
 /**
@@ -575,7 +575,7 @@ function renderGridView() {
         const statusColor = statusColors[estado] || 'bg-gray-500';
         
         html += `
-            <div class="bg-gray-750 rounded-xl border border-gray-700 overflow-hidden hover:border-umbramed-500/50 transition-all duration-300 animate-fadeIn" style="animation-delay: ${index * 50}ms">
+            <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden hover:border-umbramed-500/50 transition-all duration-300 animate-fadeIn" style="animation-delay: ${index * 50}ms">
                 <div class="p-5">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-3">
@@ -1210,6 +1210,18 @@ function setupEventListeners() {
     document.getElementById('refreshBtn').addEventListener('click', async () => {
         await fetchRecords();
         showToast('info', 'Actualizado', 'Los datos han sido actualizados');
+    });
+    
+    // Theme toggle
+    document.getElementById('themeToggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        if (html.classList.contains('dark')) {
+            html.classList.remove('dark');
+            showToast('info', 'Tema', 'Modo claro activado');
+        } else {
+            html.classList.add('dark');
+            showToast('info', 'Tema', 'Modo oscuro activado');
+        }
     });
     
     // Form submission
