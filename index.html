@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Umbramed Academy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🟢</text></svg>">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        betis: {
+                            green: '#009B48',
+                            white: '#FFFFFF',
+                            black: '#000000'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+    <!-- Landing Page (Public Layer) -->
+    <div id="landing-page" class="bg-white">
+        <!-- Hero Section -->
+        <section class="bg-betis-green text-white">
+            <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
+                <div class="mr-auto place-self-center lg:col-span-7">
+                    <h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">Domina tu examen con Umbramed Academy</h1>
+                    <p class="max-w-2xl mb-6 font-light text-gray-200 lg:mb-8 md:text-lg lg:text-xl">La plataforma definitiva para estudiantes de medicina. Practica con preguntas reales, analiza tu rendimiento y alcanza la excelencia.</p>
+                    <a href="#" onclick="enterApp('library')" class="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-betis-green bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100">
+                        Empezar Ahora
+                        <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                    </a>
+                    <a href="#" onclick="enterApp('practice')" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white border border-white rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-gray-100">
+                        Ver Demo
+                    </a>
+                </div>
+                <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
+                    <!-- Placeholder for Hero Image or Interactive Card -->
+                    <div class="bg-white text-gray-900 p-6 rounded-lg shadow-lg w-full max-w-sm">
+                        <div class="text-xs font-bold text-betis-green uppercase mb-2">Pregunta de Ejemplo</div>
+                        <h3 class="text-lg font-bold mb-4">¿Cuál es el tratamiento de elección para...?</h3>
+                        <div class="space-y-2">
+                            <div class="p-2 border rounded hover:bg-gray-50 cursor-pointer">A) Opción A</div>
+                            <div class="p-2 border rounded bg-green-100 border-green-500 cursor-pointer">B) Opción Correcta</div>
+                            <div class="p-2 border rounded hover:bg-gray-50 cursor-pointer">C) Opción C</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section class="bg-white dark:bg-gray-900">
+            <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
+                <div class="max-w-screen-md mb-8 lg:mb-16">
+                    <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Diseñado para el éxito</h2>
+                    <p class="text-gray-500 sm:text-xl dark:text-gray-400">Nuestra metodología se basa en el recuerdo activo y la repetición espaciada.</p>
+                </div>
+                <div class="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-12 md:space-y-0">
+                    <div>
+                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-green-100 lg:h-12 lg:w-12 dark:bg-green-900">
+                            <svg class="w-5 h-5 text-betis-green lg:w-6 lg:h-6 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+                        </div>
+                        <h3 class="mb-2 text-xl font-bold dark:text-white">Banco de Preguntas</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Accede a miles de preguntas actualizadas y revisadas por expertos.</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-green-100 lg:h-12 lg:w-12 dark:bg-green-900">
+                            <svg class="w-5 h-5 text-betis-green lg:w-6 lg:h-6 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 10-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <h3 class="mb-2 text-xl font-bold dark:text-white">Analíticas Detalladas</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Visualiza tu progreso y detecta tus áreas de mejora al instante.</p>
+                    </div>
+                    <div>
+                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-green-100 lg:h-12 lg:w-12 dark:bg-green-900">
+                            <svg class="w-5 h-5 text-betis-green lg:w-6 lg:h-6 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>
+                        </div>
+                        <h3 class="mb-2 text-xl font-bold dark:text-white">Modo Examen</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Simula las condiciones reales del examen sin distracciones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- App Layer (Private) -->
+    <div id="app-layout" class="hidden">
+        <!-- Navbar (Modified) -->
+        <nav class="bg-betis-green border-gray-200 dark:bg-gray-900">
+            <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+                <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse" onclick="showLanding()">
+                    <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">Umbramed Academy</span>
+                </a>
+                
+                <!-- View Switcher -->
+                <div class="hidden md:flex space-x-4">
+                    <button onclick="switchView('library')" id="nav-library" class="text-white font-medium hover:text-gray-200 border-b-2 border-white pb-1">Biblioteca</button>
+                    <button onclick="switchView('practice')" id="nav-practice" class="text-green-100 font-medium hover:text-white pb-1">Practicar</button>
+                </div>
+
+                <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
+                    <button type="button" data-modal-target="question-modal" data-modal-toggle="question-modal" class="text-betis-green bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center" onclick="openCreateModal()">
+                        Nueva Pregunta
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <div class="max-w-screen-xl mx-auto p-4">
+            
+            <!-- Library View (Existing) -->
+            <div id="library-view">
+                <!-- Filters & Search -->
+                <div class="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 gap-4">
+                    <div class="w-full md:w-1/2 flex flex-col md:flex-row gap-4">
+                        <form class="flex items-center w-full">   
+                            <label for="simple-search" class="sr-only">Buscar</label>
+                            <div class="relative w-full">
+                                <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+                                    <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+                                    </svg>
+                                </div>
+                                <input type="text" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full ps-10 p-2.5" placeholder="Buscar pregunta..." required>
+                            </div>
+                        </form>
+                        <select id="sort-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full md:w-auto p-2.5">
+                            <option value="createdTime-desc">Más recientes</option>
+                            <option value="createdTime-asc">Más antiguas</option>
+                            <option value="Question Number-asc">Número (Asc)</option>
+                            <option value="Question Number-desc">Número (Desc)</option>
+                        </select>
+                    </div>
+                    <div class="flex space-x-2">
+                        <button id="refresh-btn" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">
+                            Actualizar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="relative overflow-x-auto shadow-md sm:rounded-lg bg-white">
+                    <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">ID</th>
+                                <th scope="col" class="px-6 py-3">Pregunta</th>
+                                <th scope="col" class="px-6 py-3">Opciones</th>
+                                <th scope="col" class="px-6 py-3">Respuesta</th>
+                                <th scope="col" class="px-6 py-3">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="questions-table-body">
+                            <!-- Rows will be populated by JS -->
+                            <tr class="bg-white border-b hover:bg-gray-50">
+                                <td colspan="5" class="px-6 py-4 text-center">Cargando datos...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <nav class="flex items-center flex-column flex-wrap md:flex-row justify-between pt-4" aria-label="Table navigation">
+                    <span class="text-sm font-normal text-gray-500 mb-4 md:mb-0 block w-full md:inline md:w-auto">Mostrando <span class="font-semibold text-gray-900" id="showing-range">1-10</span> de <span class="font-semibold text-gray-900" id="total-records">...</span></span>
+                    <ul class="inline-flex -space-x-px rtl:space-x-reverse text-sm h-8">
+                        <li>
+                            <button id="prev-page" class="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700">Anterior</button>
+                        </li>
+                        <li>
+                            <button id="next-page" class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700">Siguiente</button>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <!-- Practice View (New) -->
+            <div id="practice-view" class="hidden max-w-3xl mx-auto">
+                <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
+                    <!-- Progress Header -->
+                    <div class="flex justify-between items-center mb-6">
+                        <span class="text-sm font-medium text-gray-500">Pregunta <span id="current-q-num">1</span> de <span id="total-q-num">10</span></span>
+                        <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">Modo Práctica</span>
+                    </div>
+                    
+                    <!-- Question Content -->
+                    <div id="exam-content">
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-6" id="exam-question-text">Cargando pregunta...</h2>
+                        
+                        <div class="space-y-3" id="exam-options">
+                            <!-- Options injected here -->
+                        </div>
+                    </div>
+
+                    <!-- Feedback Section (Hidden initially) -->
+                    <div id="exam-feedback" class="hidden mt-6 p-4 rounded-lg bg-gray-50 border border-gray-200">
+                        <h3 class="font-bold text-lg mb-2" id="feedback-title">Resultado</h3>
+                        <p id="feedback-text" class="text-gray-700"></p>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="flex justify-between items-center mt-8 pt-4 border-t border-gray-100">
+                        <button onclick="prevQuestion()" class="text-gray-500 hover:text-gray-900 font-medium text-sm px-5 py-2.5">Anterior</button>
+                        <button onclick="checkAnswer()" id="check-btn" class="text-white bg-betis-green hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">Comprobar</button>
+                        <button onclick="nextQuestion()" id="next-btn" class="hidden text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white rounded-lg shadow m-4 dark:bg-gray-800">
+        <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+          <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2025 <a href="#" class="hover:underline">Umbramed Academy™</a>. All Rights Reserved.
+        </span>
+        <ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
+            <li>
+                <a href="#" class="hover:underline me-4 md:me-6">About</a>
+            </li>
+            <li>
+                <a href="#" class="hover:underline me-4 md:me-6">Privacy Policy</a>
+            </li>
+            <li>
+                <a href="#" class="hover:underline me-4 md:me-6">Licensing</a>
+            </li>
+            <li>
+                <a href="#" class="hover:underline">Contact</a>
+            </li>
+        </ul>
+        </div>
+    </footer>
+
+    <!-- Create/Edit Modal -->
+    <div id="question-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-2xl max-h-full">
+            <!-- Modal content -->
+            <div class="relative bg-white rounded-lg shadow">
+                <!-- Modal header -->
+                <div class="flex items-center justify-between p-4 md:p-5 border-b rounded-t">
+                    <h3 class="text-xl font-semibold text-gray-900" id="modal-title">
+                        Nueva Pregunta
+                    </h3>
+                    <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="question-modal">
+                        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                        </svg>
+                        <span class="sr-only">Cerrar modal</span>
+                    </button>
+                </div>
+                <!-- Modal body -->
+                <div class="p-4 md:p-5 space-y-4">
+                    <form id="question-form">
+                        <input type="hidden" id="question-id">
+                        <div class="grid gap-4 mb-4 grid-cols-2">
+                            <div class="col-span-2">
+                                <label for="question-text" class="block mb-2 text-sm font-medium text-gray-900">Texto de la Pregunta</label>
+                                <textarea id="question-text" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-betis-green focus:border-betis-green" placeholder="Escriba la pregunta aquí..." required></textarea>
+                            </div>
+                            <div class="col-span-1">
+                                <label for="option-a" class="block mb-2 text-sm font-medium text-gray-900">Opción A</label>
+                                <input type="text" id="option-a" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5" required>
+                            </div>
+                            <div class="col-span-1">
+                                <label for="option-b" class="block mb-2 text-sm font-medium text-gray-900">Opción B</label>
+                                <input type="text" id="option-b" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5" required>
+                            </div>
+                            <div class="col-span-1">
+                                <label for="option-c" class="block mb-2 text-sm font-medium text-gray-900">Opción C</label>
+                                <input type="text" id="option-c" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5" required>
+                            </div>
+                            <div class="col-span-1">
+                                <label for="option-d" class="block mb-2 text-sm font-medium text-gray-900">Opción D</label>
+                                <input type="text" id="option-d" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5" required>
+                            </div>
+                            <div class="col-span-1">
+                                <label for="correct-answer" class="block mb-2 text-sm font-medium text-gray-900">Respuesta Correcta</label>
+                                <select id="correct-answer" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5">
+                                    <option value="A">A</option>
+                                    <option value="B">B</option>
+                                    <option value="C">C</option>
+                                    <option value="D">D</option>
+                                </select>
+                            </div>
+                            <div class="col-span-1">
+                                <label for="question-number" class="block mb-2 text-sm font-medium text-gray-900">Número de Pregunta</label>
+                                <input type="number" id="question-number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5">
+                            </div>
+                        </div>
+                        <button type="submit" class="text-white inline-flex items-center bg-betis-green hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                            <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
+                            Guardar Pregunta
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" tabindex="-1" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative p-4 w-full max-w-md max-h-full">
+            <div class="relative bg-white rounded-lg shadow">
+                <button type="button" class="absolute top-3 end-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 ms-auto inline-flex justify-center items-center" data-modal-hide="delete-modal">
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                    </svg>
+                    <span class="sr-only">Cerrar modal</span>
+                </button>
+                <div class="p-4 md:p-5 text-center">
+                    <svg class="mx-auto mb-4 text-gray-400 w-12 h-12" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 11V6m0 8h.01M19 10a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+                    </svg>
+                    <h3 class="mb-5 text-lg font-normal text-gray-500">¿Estás seguro de que deseas eliminar esta pregunta?</h3>
+                    <button id="confirm-delete-btn" data-modal-hide="delete-modal" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center me-2">
+                        Sí, eliminar
+                    </button>
+                    <button data-modal-hide="delete-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10">No, cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.js"></script>
+    <script src="config.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
