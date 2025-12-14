@@ -3,10 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Umbramed Academy</title>
+    <title>Umbramed Academy - Plataforma de Estudio para Medicina</title>
+    <meta name="description" content="Domina tu examen de medicina con Umbramed Academy. Practica con preguntas reales, analiza tu rendimiento y alcanza la excelencia.">
+    <meta name="keywords" content="medicina, examen, MIR, preguntas, estudio, práctica, academia">
+    <meta name="author" content="Umbramed Academy">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Umbramed Academy - Plataforma de Estudio para Medicina">
+    <meta property="og:description" content="Domina tu examen de medicina con preguntas reales y análisis de rendimiento.">
+    <meta property="og:site_name" content="Umbramed Academy">
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#009B48">
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🟢</text></svg>">
+    
+    <!-- Custom Styles for Transitions -->
+    <style>
+        .view-transition {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .option-card:hover {
+            transform: translateX(4px);
+            transition: transform 0.2s ease;
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
     <script>
         tailwind.config = {
             theme: {
@@ -33,11 +68,11 @@
                 <div class="mr-auto place-self-center lg:col-span-7">
                     <h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">Domina tu examen con Umbramed Academy</h1>
                     <p class="max-w-2xl mb-6 font-light text-gray-200 lg:mb-8 md:text-lg lg:text-xl">La plataforma definitiva para estudiantes de medicina. Practica con preguntas reales, analiza tu rendimiento y alcanza la excelencia.</p>
-                    <a href="#" onclick="enterApp('library')" class="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-betis-green bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100">
+                    <a href="javascript:void(0)" onclick="enterApp('specialties'); return false;" class="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-betis-green bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100">
                         Empezar Ahora
                         <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     </a>
-                    <a href="#" onclick="enterApp('practice')" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white border border-white rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-gray-100">
+                    <a href="javascript:void(0)" onclick="enterApp('practice'); return false;" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white border border-white rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-gray-100">
                         Ver Demo
                     </a>
                 </div>
@@ -80,7 +115,7 @@
                     </div>
                     <div>
                         <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-green-100 lg:h-12 lg:w-12 dark:bg-green-900">
-                            <svg class="w-5 h-5 text-betis-green lg:w-6 lg:h-6 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>
+                            <svg class="w-5 h-5 text-betis-green lg:w-6 lg:h-6 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
                         </div>
                         <h3 class="mb-2 text-xl font-bold dark:text-white">Modo Examen</h3>
                         <p class="text-gray-500 dark:text-gray-400">Simula las condiciones reales del examen sin distracciones.</p>
@@ -95,14 +130,29 @@
         <!-- Navbar (Modified) -->
         <nav class="bg-betis-green border-gray-200 dark:bg-gray-900">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-                <a href="#" class="flex items-center space-x-3 rtl:space-x-reverse" onclick="showLanding()">
+                <a href="javascript:void(0)" class="flex items-center space-x-3 rtl:space-x-reverse" onclick="showLanding(); return false;">
                     <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">Umbramed Academy</span>
                 </a>
                 
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-btn" class="md:hidden text-white p-2" onclick="toggleMobileMenu()">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+                
                 <!-- View Switcher -->
                 <div class="hidden md:flex space-x-4">
-                    <button onclick="switchView('library')" id="nav-library" class="text-white font-medium hover:text-gray-200 border-b-2 border-white pb-1">Biblioteca</button>
+                    <button onclick="switchView('specialties')" id="nav-specialties" class="text-white font-medium hover:text-gray-200 border-b-2 border-white pb-1">Inicio</button>
+                    <button onclick="switchView('library')" id="nav-library" class="text-green-100 font-medium hover:text-white pb-1">Biblioteca</button>
                     <button onclick="switchView('practice')" id="nav-practice" class="text-green-100 font-medium hover:text-white pb-1">Practicar</button>
+                </div>
+                
+                <!-- Mobile Menu (Hidden by default) -->
+                <div id="mobile-menu" class="hidden absolute top-full left-0 right-0 bg-betis-green border-t border-green-600 md:hidden">
+                    <div class="flex flex-col p-4 space-y-2">
+                        <button onclick="switchView('specialties'); toggleMobileMenu()" class="text-white font-medium py-2 text-left hover:bg-green-700 px-3 rounded">🏠 Inicio</button>
+                        <button onclick="switchView('library'); toggleMobileMenu()" class="text-white font-medium py-2 text-left hover:bg-green-700 px-3 rounded">📚 Biblioteca</button>
+                        <button onclick="switchView('practice'); toggleMobileMenu()" class="text-white font-medium py-2 text-left hover:bg-green-700 px-3 rounded">🎯 Practicar</button>
+                    </div>
                 </div>
 
                 <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
@@ -115,9 +165,34 @@
 
         <!-- Main Content -->
         <div class="max-w-screen-xl mx-auto p-4">
+
+            <!-- Specialties View (New Home) -->
+            <div id="specialties-view" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Especialidades</h2>
+                <div id="specialties-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- Specialties cards will be injected here -->
+                    <div class="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+                    <div class="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+                    <div class="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+                    <div class="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+                </div>
+            </div>
+
+            <!-- Exams View (New) -->
+            <div id="exams-view" class="hidden">
+                <div class="flex items-center mb-6">
+                    <button onclick="switchView('specialties')" class="mr-4 text-gray-500 hover:text-betis-green">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-900 dark:text-white" id="selected-specialty-title">Especialidad</h2>
+                </div>
+                <div id="exams-list" class="space-y-4">
+                    <!-- Exams cards will be injected here -->
+                </div>
+            </div>
             
             <!-- Library View (Existing) -->
-            <div id="library-view">
+            <div id="library-view" class="hidden">
                 <!-- Filters & Search -->
                 <div class="flex flex-col md:flex-row justify-between items-center mb-4 space-y-4 md:space-y-0 gap-4">
                     <div class="w-full md:w-1/2 flex flex-col md:flex-row gap-4">
@@ -132,14 +207,17 @@
                                 <input type="text" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full ps-10 p-2.5" placeholder="Buscar pregunta..." required>
                             </div>
                         </form>
-                        <select id="sort-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full md:w-auto p-2.5">
-                            <option value="createdTime-desc">Más recientes</option>
-                            <option value="createdTime-asc">Más antiguas</option>
-                            <option value="Question Number-asc">Número (Asc)</option>
-                            <option value="Question Number-desc">Número (Desc)</option>
-                        </select>
                     </div>
-                    <div class="flex space-x-2">
+
+                    <div class="w-full md:w-auto flex flex-wrap items-center justify-end gap-3">
+                        <label for="sort-select" class="sr-only">Ordenar</label>
+                        <select id="sort-select" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full md:w-auto p-2.5">
+                            <option value="Question Number-asc" selected>Número (↑)</option>
+                            <option value="Question Number-desc">Número (↓)</option>
+                            <option value="Question Text-asc">Pregunta (A-Z)</option>
+                            <option value="Question Text-desc">Pregunta (Z-A)</option>
+                        </select>
+
                         <button id="refresh-btn" class="text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">
                             Actualizar
                         </button>

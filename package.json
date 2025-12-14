@@ -1,0 +1,19 @@
+{
+  "name": "neoumbramed-3.0",
+  "version": "1.0.0",
+  "description": "Repositorio de material de consulta",
+  "main": "app.js",
+  "scripts": {
+    "start": "node server.js",
+    "test:ui": "node test-playwright.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "playwright": "^1.57.0"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3"
+  }
+}

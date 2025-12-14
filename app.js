@@ -1,8 +1,5 @@
-// Keys are loaded from config.js
-// const API_KEY = '...';
-// const BASE_ID = '...';
-// const TABLE_ID = '...';
-// const API_URL = ...;
+const UMBRAMED_CONFIG = (typeof window !== 'undefined' && window.UMBRAMED_CONFIG) ? window.UMBRAMED_CONFIG : {};
+const API_URL = UMBRAMED_CONFIG.API_URL || '/api/questions';
 
 let allRecords = [];
 let currentOffset = null;
@@ -12,24 +9,255 @@ let isEditing = false;
 let currentEditId = null;
 let deleteId = null;
 
-// DOM Elements
-const tableBody = document.getElementById('questions-table-body');
-const prevPageBtn = document.getElementById('prev-page');
-const nextPageBtn = document.getElementById('next-page');
-const showingRange = document.getElementById('showing-range');
-const totalRecordsSpan = document.getElementById('total-records');
-const searchInput = document.getElementById('simple-search');
-const sortSelect = document.getElementById('sort-select');
-const refreshBtn = document.getElementById('refresh-btn');
-const questionForm = document.getElementById('question-form');
-const modalTitle = document.getElementById('modal-title');
-const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+// Navigation & View Logic
+window.enterApp = function(view = 'specialties') {
+    document.getElementById('landing-page').classList.add('hidden');
+    document.getElementById('app-layout').classList.remove('hidden');
+    switchView(view);
+}
+
+window.showLanding = function() {
+    document.getElementById('app-layout').classList.add('hidden');
+    document.getElementById('landing-page').classList.remove('hidden');
+}
+
+window.switchView = function(viewName) {
+    // Hide all views
+    ['specialties-view', 'exams-view', 'library-view', 'practice-view'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
+    });
+    
+    // Show selected view
+    const viewId = viewName.endsWith('-view') ? viewName : `${viewName}-view`;
+    const el = document.getElementById(viewId);
+    if (el) el.classList.remove('hidden');
+
+    // Update Nav State
+    document.querySelectorAll('nav button[id^="nav-"]').forEach(btn => {
+        btn.classList.remove('text-white', 'border-b-2', 'border-white');
+        btn.classList.add('text-green-100');
+    });
+    
+    const navBtn = document.getElementById(`nav-${viewName}`);
+    if (navBtn) {
+        navBtn.classList.remove('text-green-100');
+        navBtn.classList.add('text-white', 'border-b-2', 'border-white');
+    }
+
+    // View specific logic
+    if (viewName === 'specialties') {
+        renderSpecialties();
+    } else if (viewName === 'practice') {
+        initPracticeMode();
+    }
+}
+
+window.toggleMobileMenu = function() {
+    const menu = document.getElementById('mobile-menu');
+    if (menu) menu.classList.toggle('hidden');
+}
+
+function renderSpecialties() {
+    const grid = document.getElementById('specialties-grid');
+    if (!grid) return;
+    
+    // Extract specialties from allRecords
+    const specialties = new Set();
+    allRecords.forEach(r => {
+        const s = r.fields['Specialty Names'];
+        if (s && Array.isArray(s)) s.forEach(name => specialties.add(name));
+        else if (s) specialties.add(s);
+    });
+    
+    if (specialties.size === 0) {
+        grid.innerHTML = '<p class="col-span-full text-center text-gray-500">Cargando especialidades o no hay datos disponibles...</p>';
+        return;
+    }
+
+    grid.innerHTML = Array.from(specialties).sort().map(spec => `
+        <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer border border-gray-100" onclick="openSpecialty('${spec}')">
+            <div class="flex items-center justify-between mb-4">
+                <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center text-betis-green">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                </div>
+                <span class="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+                    ${allRecords.filter(r => {
+                        const s = r.fields['Specialty Names'];
+                        return Array.isArray(s) ? s.includes(spec) : s === spec;
+                    }).length} preguntas
+                </span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-1">${spec}</h3>
+            <p class="text-sm text-gray-500">Practicar preguntas de ${spec}</p>
+        </div>
+    `).join('');
+}
+
+window.openSpecialty = function(spec) {
+    console.log('Opening specialty:', spec);
+    showToast(`Seleccionada especialidad: ${spec}`);
+    // Filter for practice mode
+    practiceQuestions = allRecords.filter(r => {
+        const s = r.fields['Specialty Names'];
+        return Array.isArray(s) ? s.includes(spec) : s === spec;
+    }).sort(() => Math.random() - 0.5);
+    
+    switchView('practice');
+    // initPracticeMode will be called by switchView, but we want to keep our filtered list
+    // So we need to modify initPracticeMode to respect existing list if set?
+    // Or just set it here and make initPracticeMode check if empty?
+    // Let's adjust initPracticeMode.
+}
+
+// Practice Mode Logic
+let currentPracticeIndex = 0;
+let practiceQuestions = [];
+
+function initPracticeMode() {
+    // Only reset if empty (first load) or if we want to reset.
+    // If we came from openSpecialty, practiceQuestions is already set.
+    if (practiceQuestions.length === 0) {
+        practiceQuestions = [...allRecords].sort(() => Math.random() - 0.5);
+    }
+    currentPracticeIndex = 0;
+    showPracticeQuestion();
+}
+
+function showPracticeQuestion() {
+    const container = document.getElementById('exam-content');
+    if (!container || practiceQuestions.length === 0) {
+        if (container) container.innerHTML = '<p class="text-center">No hay preguntas disponibles para practicar.</p>';
+        return;
+    }
+
+    const q = practiceQuestions[currentPracticeIndex];
+    const f = q.fields;
+    
+    document.getElementById('current-q-num').textContent = currentPracticeIndex + 1;
+    document.getElementById('total-q-num').textContent = practiceQuestions.length;
+    
+    document.getElementById('exam-question-text').textContent = f['Question Text'] || 'Sin texto';
+    
+    const optionsContainer = document.getElementById('exam-options');
+    optionsContainer.innerHTML = ['A', 'B', 'C', 'D'].map(opt => `
+        <div class="option-card p-4 border rounded-lg cursor-pointer hover:bg-gray-50 transition-colors" onclick="selectOption('${opt}')" id="opt-${opt}">
+            <span class="font-bold mr-2">${opt})</span> ${escapeHtml(f[`Option ${opt}`] || '')}
+        </div>
+    `).join('');
+    
+    document.getElementById('exam-feedback').classList.add('hidden');
+    document.getElementById('check-btn').classList.remove('hidden');
+    document.getElementById('next-btn').classList.add('hidden');
+    
+    // Reset selection
+    document.querySelectorAll('.option-card').forEach(el => el.classList.remove('bg-blue-50', 'border-blue-500'));
+    selectedOption = null;
+}
+
+let selectedOption = null;
+window.s
+        // Update UI based on current view
+        const currentView = document.querySelector('div[id$="-view"]:not(.hidden)');
+        if (currentView && currentView.id === 'specialties-view') {
+            renderSpecialties();
+        } else {
+            renderTable();
+        }
+        function(opt) {
+    if (document.getElementById('exam-feedback').classList.contains('hidden') === false) return; // Already checked
+    
+    selectedOption = opt;
+    document.querySelectorAll('.option-card').forEach(el => {
+        el.classList.remove('bg-blue-50', 'border-blue-500', 'ring-2', 'ring-blue-200');
+    });
+    const el = document.getElementById(`opt-${opt}`);
+    if (el) el.classList.add('bg-blue-50', 'border-blue-500', 'ring-2', 'ring-blue-200');
+}
+
+window.checkAnswer = function() {
+    if (!selectedOption) {
+        showToast('Por favor selecciona una opción', 'error');
+        return;
+    }
+    
+    const q = practiceQuestions[currentPracticeIndex];
+    const correct = q.fields['Correct Answer'];
+    
+    const feedback = document.getElementById('exam-feedback');
+    const feedbackTitle = document.getElementById('feedback-title');
+    const feedbackText = document.getElementById('feedback-text');
+    
+    feedback.classList.remove('hidden');
+    
+    if (selectedOption === correct) {
+        feedback.className = 'mt-6 p-4 rounded-lg bg-green-50 border border-green-200';
+        feedbackTitle.textContent = '¡Correcto!';
+        feedbackTitle.className = 'font-bold text-lg mb-2 text-green-800';
+        feedbackText.textContent = 'Has seleccionado la respuesta correcta.';
+        
+        document.getElementById(`opt-${selectedOption}`).classList.add('bg-green-100', 'border-green-500');
+    } else {
+        feedback.className = 'mt-6 p-4 rounded-lg bg-red-50 border border-red-200';
+        feedbackTitle.textContent = 'Incorrecto';
+        feedbackTitle.className = 'font-bold text-lg mb-2 text-red-800';
+        feedbackText.textContent = `La respuesta correcta era la ${correct}.`;
+        
+        document.getElementById(`opt-${selectedOption}`).classList.add('bg-red-100', 'border-red-500');
+        document.getElementById(`opt-${correct}`).classList.add('bg-green-100', 'border-green-500');
+    }
+    
+    document.getElementById('check-btn').classList.add('hidden');
+    document.getElementById('next-btn').classList.remove('hidden');
+}
+
+window.nextQuestion = function() {
+    if (currentPracticeIndex < practiceQuestions.length - 1) {
+        currentPracticeIndex++;
+        showPracticeQuestion();
+    } else {
+        showToast('Has completado todas las preguntas de esta sesión.');
+    }
+}
+
+window.prevQuestion = function() {
+    if (currentPracticeIndex > 0) {
+        currentPracticeIndex--;
+        showPracticeQuestion();
+    }
+}
+
+// DOM Elements - will be initialized after DOMContentLoaded
+let tableBody;
+let prevPageBtn;
+let nextPageBtn;
+let showingRange;
+let totalRecordsSpan;
+let searchInput;
+let sortSelect;
+let refreshBtn;
+let questionForm;
+let modalTitle;
+let confirmDeleteBtn;
 
 // Modal Instances
 let questionModal;
 let deleteModal;
 
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize DOM Elements
+    tableBody = document.getElementById('questions-table-body');
+    prevPageBtn = document.getElementById('prev-page');
+    nextPageBtn = document.getElementById('next-page');
+    showingRange = document.getElementById('showing-range');
+    totalRecordsSpan = document.getElementById('total-records');
+    searchInput = document.getElementById('simple-search');
+    sortSelect = document.getElementById('sort-select');
+    refreshBtn = document.getElementById('refresh-btn');
+    questionForm = document.getElementById('question-form');
+    modalTitle = document.getElementById('modal-title');
+    confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+
     // Initialize Modals
     const $questionModalEl = document.getElementById('question-modal');
     const $deleteModalEl = document.getElementById('delete-modal');
@@ -42,49 +270,65 @@ document.addEventListener('DOMContentLoaded', () => {
         console.error('Flowbite Modal not loaded');
     }
 
+    // Don't fetch on load - wait for user to enter the app
     fetchQuestions();
 
-    // Event Listeners
-    refreshBtn.addEventListener('click', () => {
-        currentOffset = null;
-        currentPage = 1;
-        fetchQuestions();
-    });
-
-    prevPageBtn.addEventListener('click', () => {
-        if (currentPage > 1) {
-            currentPage--;
-            renderTable();
-        }
-    });
-
-    nextPageBtn.addEventListener('click', () => {
-        if ((currentPage * pageSize) < allRecords.length) {
-            currentPage++;
-            renderTable();
-        } else if (currentOffset) {
-            currentPage++;
-            fetchQuestions(currentOffset);
-        }
-    });
-
-    searchInput.addEventListener('input', debounce((e) => {
-        const searchTerm = e.target.value;
-        if (searchTerm.length > 2 || searchTerm.length === 0) {
+    // Event Listeners - only add if elements exist
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
             currentOffset = null;
             currentPage = 1;
-            fetchQuestions(null, searchTerm);
-        }
-    }, 500));
+            fetchQuestions();
+        });
+    }
 
-    sortSelect.addEventListener('change', () => {
-        currentOffset = null;
-        currentPage = 1;
-        fetchQuestions(null, searchInput.value);
-    });
+    if (prevPageBtn) {
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderTable();
+            }
+        });
+    }
 
-    questionForm.addEventListener('submit', handleFormSubmit);
-    confirmDeleteBtn.addEventListener('click', executeDelete);
+    if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => {
+            if ((currentPage * pageSize) < allRecords.length) {
+                currentPage++;
+                renderTable();
+            } else if (currentOffset) {
+                currentPage++;
+                fetchQuestions(currentOffset);
+            }
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce((e) => {
+            const searchTerm = e.target.value;
+            if (searchTerm.length > 2 || searchTerm.length === 0) {
+                currentOffset = null;
+                currentPage = 1;
+                fetchQuestions(null, searchTerm);
+            }
+        }, 500));
+    }
+
+    if (sortSelect) {
+        sortSelect.addEventListener('change', () => {
+            currentOffset = null;
+            currentPage = 1;
+            fetchQuestions(null, searchInput ? searchInput.value : '');
+        });
+    }
+
+    if (questionForm) {
+        questionForm.addEventListener('submit', handleFormSubmit);
+    }
+    
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', executeDelete);
+    }
 });
 
 function debounce(func, wait) {
@@ -117,11 +361,7 @@ async function fetchQuestions(offset = null, searchTerm = '') {
 
     try {
         setLoading(true);
-        const response = await fetch(url, {
-            headers: {
-                'Authorization': `Bearer ${API_KEY}`
-            }
-        });
+        const response = await fetch(url);
 
         if (!response.ok) throw new Error('Error fetching data');
 
@@ -167,7 +407,24 @@ function renderTable(records = allRecords) {
     tableBody.innerHTML = '';
 
     if (pageRecords.length === 0) {
-        tableBody.innerHTML = `<tr><td colspan="5" class="px-6 py-4 text-center">No se encontraron registros.</td></tr>`;
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="5" class="px-6 py-12 text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <h3 class="mt-2 text-sm font-semibold text-gray-900">No hay preguntas</h3>
+                    <p class="mt-1 text-sm text-gray-500">Comienza creando una nueva pregunta.</p>
+                    <div class="mt-4">
+                        <button onclick="openCreateModal()" class="inline-flex items-center rounded-md bg-betis-green px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-700">
+                            <svg class="mr-1.5 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+                            </svg>
+                            Nueva Pregunta
+                        </button>
+                    </div>
+                </td>
+            </tr>`;
         return;
     }
 
@@ -350,7 +607,6 @@ async function handleFormSubmit(e) {
             },
             body: JSON.stringify(data)
         });
-
         if (!response.ok) throw new Error('Error saving data');
 
         questionModal.hide();
@@ -384,10 +640,7 @@ async function executeDelete() {
                 'Authorization': `Bearer ${API_KEY}`
             }
         });
-
-        if (!response.ok) throw new Error('Error deleting');
-
-        deleteModal.hide();
+eModal.hide();
         deleteId = null;
         showToast('Pregunta eliminada correctamente');
         
@@ -399,170 +652,5 @@ async function executeDelete() {
     } catch (error) {
         console.error('Error deleting:', error);
         showToast('Error al eliminar. Revisa la consola.', 'error');
-    }
-}
-
-// --- View Switching & Exam Logic ---
-
-function enterApp(view = 'library') {
-    document.getElementById('landing-page').classList.add('hidden');
-    document.getElementById('app-layout').classList.remove('hidden');
-    switchView(view);
-}
-
-function showLanding() {
-    document.getElementById('app-layout').classList.add('hidden');
-    document.getElementById('landing-page').classList.remove('hidden');
-}
-
-function switchView(viewName) {
-    const libraryView = document.getElementById('library-view');
-    const practiceView = document.getElementById('practice-view');
-    const navLibrary = document.getElementById('nav-library');
-    const navPractice = document.getElementById('nav-practice');
-
-    if (viewName === 'library') {
-        libraryView.classList.remove('hidden');
-        practiceView.classList.add('hidden');
-        
-        navLibrary.classList.add('border-b-2', 'border-white', 'text-white');
-        navLibrary.classList.remove('text-green-100');
-        
-        navPractice.classList.remove('border-b-2', 'border-white', 'text-white');
-        navPractice.classList.add('text-green-100');
-    } else {
-        libraryView.classList.add('hidden');
-        practiceView.classList.remove('hidden');
-        
-        navPractice.classList.add('border-b-2', 'border-white', 'text-white');
-        navPractice.classList.remove('text-green-100');
-        
-        navLibrary.classList.remove('border-b-2', 'border-white', 'text-white');
-        navLibrary.classList.add('text-green-100');
-        
-        startExam();
-    }
-}
-
-// Exam State
-let examQuestions = [];
-let currentQuestionIndex = 0;
-
-function startExam() {
-    // Use currently loaded records for the exam
-    // Shuffle them for randomness
-    examQuestions = [...allRecords].sort(() => Math.random() - 0.5);
-    currentQuestionIndex = 0;
-    
-    const examContent = document.getElementById('exam-content');
-    
-    if (examQuestions.length === 0) {
-        examContent.innerHTML = '<p class="text-center text-gray-500">No hay preguntas disponibles para practicar.</p>';
-        return;
-    }
-    
-    // Restore structure if it was overwritten by end screen
-    if (!document.getElementById('exam-question-text')) {
-        examContent.innerHTML = `
-            <h2 class="text-xl md:text-2xl font-bold text-gray-900 mb-6" id="exam-question-text">Cargando pregunta...</h2>
-            <div class="space-y-3" id="exam-options"></div>
-        `;
-    }
-    
-    document.getElementById('total-q-num').textContent = examQuestions.length;
-    renderExamQuestion();
-}
-
-function renderExamQuestion() {
-    const record = examQuestions[currentQuestionIndex];
-    const fields = record.fields;
-    
-    document.getElementById('current-q-num').textContent = currentQuestionIndex + 1;
-    document.getElementById('exam-question-text').textContent = fields['Question Text'] || 'Sin texto';
-    
-    const optionsContainer = document.getElementById('exam-options');
-    optionsContainer.innerHTML = '';
-    
-    const options = ['A', 'B', 'C', 'D'];
-    options.forEach(opt => {
-        const text = fields[`Option ${opt}`];
-        if (text) {
-            const div = document.createElement('div');
-            div.className = 'flex items-center ps-4 border border-gray-200 rounded dark:border-gray-700 cursor-pointer hover:bg-gray-50';
-            div.innerHTML = `
-                <input id="option-${opt}" type="radio" value="${opt}" name="exam-option" class="w-4 h-4 text-betis-green bg-gray-100 border-gray-300 focus:ring-betis-green dark:focus:ring-betis-green dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
-                <label for="option-${opt}" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300 cursor-pointer">
-                    <span class="font-bold mr-2">${opt})</span> ${escapeHtml(text)}
-                </label>
-            `;
-            optionsContainer.appendChild(div);
-        }
-    });
-    
-    // Reset UI
-    document.getElementById('exam-feedback').classList.add('hidden');
-    document.getElementById('check-btn').classList.remove('hidden');
-    document.getElementById('next-btn').classList.add('hidden');
-    
-    // Enable/Disable Prev button
-    // (Optional: Implement Prev button logic if needed, currently just resets or goes back)
-}
-
-function checkAnswer() {
-    const selected = document.querySelector('input[name="exam-option"]:checked');
-    if (!selected) {
-        showToast('Por favor selecciona una opción', 'error');
-        return;
-    }
-    
-    const record = examQuestions[currentQuestionIndex];
-    const correct = record.fields['Correct Answer'];
-    const userVal = selected.value;
-    
-    const feedbackEl = document.getElementById('exam-feedback');
-    const feedbackTitle = document.getElementById('feedback-title');
-    const feedbackText = document.getElementById('feedback-text');
-    
-    feedbackEl.classList.remove('hidden');
-    
-    if (userVal === correct) {
-        feedbackEl.className = 'mt-6 p-4 rounded-lg bg-green-50 border border-green-200';
-        feedbackTitle.textContent = '¡Correcto!';
-        feedbackTitle.className = 'font-bold text-lg mb-2 text-green-800';
-        feedbackText.textContent = '¡Muy bien! Has seleccionado la respuesta correcta.';
-    } else {
-        feedbackEl.className = 'mt-6 p-4 rounded-lg bg-red-50 border border-red-200';
-        feedbackTitle.textContent = 'Incorrecto';
-        feedbackTitle.className = 'font-bold text-lg mb-2 text-red-800';
-        feedbackText.innerHTML = `La respuesta correcta era la <strong>${correct}</strong>.`;
-    }
-    
-    document.getElementById('check-btn').classList.add('hidden');
-    document.getElementById('next-btn').classList.remove('hidden');
-}
-
-function nextQuestion() {
-    if (currentQuestionIndex < examQuestions.length - 1) {
-        currentQuestionIndex++;
-        renderExamQuestion();
-    } else {
-        // End of exam
-        document.getElementById('exam-content').innerHTML = `
-            <div class="text-center py-10">
-                <h3 class="text-2xl font-bold text-gray-900 mb-4">¡Has completado la práctica!</h3>
-                <p class="text-gray-500 mb-6">Has repasado ${examQuestions.length} preguntas.</p>
-                <button onclick="startExam()" class="text-white bg-betis-green hover:bg-green-800 font-medium rounded-lg text-sm px-5 py-2.5">Volver a empezar</button>
-            </div>
-        `;
-        document.getElementById('exam-feedback').classList.add('hidden');
-        document.getElementById('check-btn').classList.add('hidden');
-        document.getElementById('next-btn').classList.add('hidden');
-    }
-}
-
-function prevQuestion() {
-    if (currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-        renderExamQuestion();
     }
 }
