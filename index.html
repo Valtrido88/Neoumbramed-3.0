@@ -3,24 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Umbramed Academy - Plataforma de Estudio para Medicina</title>
-    <meta name="description" content="Domina tu examen de medicina con Umbramed Academy. Practica con preguntas reales, analiza tu rendimiento y alcanza la excelencia.">
-    <meta name="keywords" content="medicina, examen, MIR, preguntas, estudio, práctica, academia">
-    <meta name="author" content="Umbramed Academy">
+    <title>Umbramed - Herramientas Clínicas para Profesionales de la Salud</title>
+    <meta name="description" content="Umbramed: calculadoras médicas, herramientas clínicas y recursos para profesionales de la salud. Dosificación pediátrica, IMC, aclaramiento de creatinina.">
+    <meta name="keywords" content="medicina, calculadora, pediátrica, IMC, creatinina, herramientas clínicas">
+    <meta name="author" content="Umbramed">
     <meta name="robots" content="index, follow">
     
     <!-- Open Graph / Social -->
     <meta property="og:type" content="website">
-    <meta property="og:title" content="Umbramed Academy - Plataforma de Estudio para Medicina">
-    <meta property="og:description" content="Domina tu examen de medicina con preguntas reales y análisis de rendimiento.">
-    <meta property="og:site_name" content="Umbramed Academy">
+    <meta property="og:title" content="Umbramed - Herramientas Clínicas">
+    <meta property="og:description" content="Calculadoras médicas y herramientas clínicas para profesionales de la salud.">
+    <meta property="og:site_name" content="Umbramed">
     
     <!-- Theme Color -->
-    <meta name="theme-color" content="#009B48">
+    <meta name="theme-color" content="#DC2626">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.0/flowbite.min.css" rel="stylesheet" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🟢</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>�</text></svg>">
     
     <!-- Custom Styles for Transitions -->
     <style>
@@ -41,14 +41,43 @@
         .progress-bar {
             transition: width 0.5s ease-in-out;
         }
+        /* Smooth view transitions */
+        [id$="-view"] {
+            transition: opacity 0.2s ease-in-out;
+        }
+        [id$="-view"]:not(.hidden) {
+            animation: fadeIn 0.25s ease-out;
+        }
+        /* Mobile menu animation */
+        #mobile-menu.menu-entering {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        #mobile-menu:not(.hidden) {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        /* Overlay for mobile menu */
+        #mobile-menu-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 40;
+            transition: opacity 0.2s ease-in-out;
+        }
+        #mobile-menu-overlay.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
     </style>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        betis: {
-                            green: '#009B48',
+                        umbramed: {
+                            red: '#DC2626',
+                            darkred: '#B91C1C',
                             white: '#FFFFFF',
                             black: '#000000'
                         }
@@ -59,32 +88,40 @@
     </script>
 </head>
 <body class="bg-gray-50 text-gray-900">
+    <!-- Mobile Menu Overlay -->
+    <div id="mobile-menu-overlay" class="hidden" onclick="closeMobileMenu()"></div>
 
     <!-- Landing Page (Public Layer) -->
     <div id="landing-page" class="bg-white">
         <!-- Hero Section -->
-        <section class="bg-betis-green text-white">
+        <section class="bg-red-600 text-white">
             <div class="grid max-w-screen-xl px-4 py-8 mx-auto lg:gap-8 xl:gap-0 lg:py-16 lg:grid-cols-12">
                 <div class="mr-auto place-self-center lg:col-span-7">
-                    <h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">Domina tu examen con Umbramed Academy</h1>
-                    <p class="max-w-2xl mb-6 font-light text-gray-200 lg:mb-8 md:text-lg lg:text-xl">La plataforma definitiva para estudiantes de medicina. Practica con preguntas reales, analiza tu rendimiento y alcanza la excelencia.</p>
-                    <a href="javascript:void(0)" onclick="enterApp('specialties'); return false;" class="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-betis-green bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100">
-                        Empezar Ahora
+                    <h1 class="max-w-2xl mb-4 text-4xl font-extrabold tracking-tight leading-none md:text-5xl xl:text-6xl">Umbramed</h1>
+                    <p class="max-w-2xl mb-6 font-light text-gray-200 lg:mb-8 md:text-lg lg:text-xl">Herramientas clínicas esenciales para profesionales de la salud. Calculadoras médicas precisas y recursos actualizados.</p>
+                    <a href="javascript:void(0)" onclick="enterApp('tools'); return false;" class="inline-flex items-center justify-center px-5 py-3 mr-3 text-base font-medium text-center text-red-600 bg-white rounded-lg hover:bg-gray-100 focus:ring-4 focus:ring-gray-100">
+                        Acceder a Herramientas
                         <svg class="w-5 h-5 ml-2 -mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     </a>
-                    <a href="javascript:void(0)" onclick="enterApp('practice'); return false;" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white border border-white rounded-lg hover:bg-green-800 focus:ring-4 focus:ring-gray-100">
-                        Ver Demo
+                    <a href="https://umbramed.es" target="_blank" rel="noopener noreferrer" class="inline-flex items-center justify-center px-5 py-3 text-base font-medium text-center text-white border border-white rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-gray-100">
+                        Visitar umbramed.es
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                     </a>
                 </div>
                 <div class="hidden lg:mt-0 lg:col-span-5 lg:flex">
-                    <!-- Placeholder for Hero Image or Interactive Card -->
+                    <!-- Announcement Card -->
                     <div class="bg-white text-gray-900 p-6 rounded-lg shadow-lg w-full max-w-sm">
-                        <div class="text-xs font-bold text-betis-green uppercase mb-2">Pregunta de Ejemplo</div>
-                        <h3 class="text-lg font-bold mb-4">¿Cuál es el tratamiento de elección para...?</h3>
-                        <div class="space-y-2">
-                            <div class="p-2 border rounded hover:bg-gray-50 cursor-pointer">A) Opción A</div>
-                            <div class="p-2 border rounded bg-green-100 border-green-500 cursor-pointer">B) Opción Correcta</div>
-                            <div class="p-2 border rounded hover:bg-gray-50 cursor-pointer">C) Opción C</div>
+                        <div class="text-xs font-bold text-red-600 uppercase mb-2">📢 Tablón de Anuncios</div>
+                        <h3 class="text-lg font-bold mb-4">Novedades Umbramed</h3>
+                        <div class="space-y-3">
+                            <a href="https://umbramed.es" target="_blank" class="block p-3 border rounded-lg hover:bg-green-50 hover:border-red-500 transition-colors">
+                                <p class="font-medium text-gray-900">🌐 Nueva web disponible</p>
+                                <p class="text-sm text-gray-500">Visita umbramed.es para más información</p>
+                            </a>
+                            <a href="https://umbramed.es" target="_blank" class="block p-3 border rounded-lg hover:bg-green-50 hover:border-red-500 transition-colors">
+                                <p class="font-medium text-gray-900">🧮 Calculadoras actualizadas</p>
+                                <p class="text-sm text-gray-500">Nuevos medicamentos en dosificación pediátrica</p>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -95,31 +132,39 @@
         <section class="bg-white dark:bg-gray-900">
             <div class="py-8 px-4 mx-auto max-w-screen-xl sm:py-16 lg:px-6">
                 <div class="max-w-screen-md mb-8 lg:mb-16">
-                    <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Diseñado para el éxito</h2>
-                    <p class="text-gray-500 sm:text-xl dark:text-gray-400">Nuestra metodología se basa en el recuerdo activo y la repetición espaciada.</p>
+                    <h2 class="mb-4 text-4xl tracking-tight font-extrabold text-gray-900 dark:text-white">Herramientas Clínicas</h2>
+                    <p class="text-gray-500 sm:text-xl dark:text-gray-400">Calculadoras médicas precisas y actualizadas para tu práctica clínica diaria.</p>
                 </div>
                 <div class="space-y-8 md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-12 md:space-y-0">
                     <div>
-                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-green-100 lg:h-12 lg:w-12 dark:bg-green-900">
-                            <svg class="w-5 h-5 text-betis-green lg:w-6 lg:h-6 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"></path></svg>
+                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-blue-100 lg:h-12 lg:w-12">
+                            <svg class="w-5 h-5 text-blue-600 lg:w-6 lg:h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
                         </div>
-                        <h3 class="mb-2 text-xl font-bold dark:text-white">Banco de Preguntas</h3>
-                        <p class="text-gray-500 dark:text-gray-400">Accede a miles de preguntas actualizadas y revisadas por expertos.</p>
+                        <h3 class="mb-2 text-xl font-bold dark:text-white">Dosificación Pediátrica</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Base de datos extensa con 60+ medicamentos, dosis por peso y advertencias.</p>
                     </div>
                     <div>
-                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-green-100 lg:h-12 lg:w-12 dark:bg-green-900">
-                            <svg class="w-5 h-5 text-betis-green lg:w-6 lg:h-6 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 10-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"></path></svg>
+                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-purple-100 lg:h-12 lg:w-12">
+                            <svg class="w-5 h-5 text-purple-600 lg:w-6 lg:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7zm-3 1a1 1 0 10-2 0v3a1 1 0 102 0V8zM8 9a1 1 0 10-2 0v2a1 1 0 102 0V9z" clip-rule="evenodd"></path></svg>
                         </div>
-                        <h3 class="mb-2 text-xl font-bold dark:text-white">Analíticas Detalladas</h3>
-                        <p class="text-gray-500 dark:text-gray-400">Visualiza tu progreso y detecta tus áreas de mejora al instante.</p>
+                        <h3 class="mb-2 text-xl font-bold dark:text-white">Calculadora IMC</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Índice de masa corporal con clasificación OMS instantánea.</p>
                     </div>
                     <div>
-                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-green-100 lg:h-12 lg:w-12 dark:bg-green-900">
-                            <svg class="w-5 h-5 text-betis-green lg:w-6 lg:h-6 dark:text-green-300" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
+                        <div class="flex justify-center items-center mb-4 w-10 h-10 rounded-full bg-orange-100 lg:h-12 lg:w-12">
+                            <svg class="w-5 h-5 text-orange-600 lg:w-6 lg:h-6" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>
                         </div>
-                        <h3 class="mb-2 text-xl font-bold dark:text-white">Modo Examen</h3>
-                        <p class="text-gray-500 dark:text-gray-400">Simula las condiciones reales del examen sin distracciones.</p>
+                        <h3 class="mb-2 text-xl font-bold dark:text-white">Aclaramiento Creatinina</h3>
+                        <p class="text-gray-500 dark:text-gray-400">Fórmula Cockcroft-Gault con estadios ERC según KDIGO.</p>
                     </div>
+                </div>
+                
+                <!-- CTA to umbramed.es -->
+                <div class="mt-12 text-center">
+                    <a href="https://umbramed.es" target="_blank" rel="noopener noreferrer" class="inline-flex items-center px-6 py-3 text-lg font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-300">
+                        Descubre más en umbramed.es
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
                 </div>
             </div>
         </section>
@@ -128,37 +173,43 @@
     <!-- App Layer (Private) -->
     <div id="app-layout" class="hidden">
         <!-- Navbar (Modified) -->
-        <nav class="bg-betis-green border-gray-200 dark:bg-gray-900">
+        <nav class="bg-red-600 border-gray-200 dark:bg-gray-900 relative">
             <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
                 <a href="javascript:void(0)" class="flex items-center space-x-3 rtl:space-x-reverse" onclick="showLanding(); return false;">
-                    <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">Umbramed Academy</span>
+                    <span class="self-center text-2xl font-semibold whitespace-nowrap text-white">Umbramed</span>
                 </a>
                 
                 <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="md:hidden text-white p-2" onclick="toggleMobileMenu()">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                <button id="mobile-menu-btn" class="md:hidden text-white p-2 rounded-lg hover:bg-red-700 transition-colors" onclick="toggleMobileMenu(event)" aria-label="Abrir menú">
+                    <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 
                 <!-- View Switcher -->
-                <div class="hidden md:flex space-x-4">
-                    <button onclick="switchView('specialties')" id="nav-specialties" class="text-white font-medium hover:text-gray-200 border-b-2 border-white pb-1">Inicio</button>
-                    <button onclick="switchView('library')" id="nav-library" class="text-green-100 font-medium hover:text-white pb-1">Biblioteca</button>
-                    <button onclick="switchView('practice')" id="nav-practice" class="text-green-100 font-medium hover:text-white pb-1">Practicar</button>
+                <div class="hidden md:flex space-x-4 items-center">
+                    <button onclick="switchView('tools')" id="nav-tools" class="text-white font-medium hover:text-gray-200 border-b-2 border-white pb-1 transition-colors">Herramientas</button>
+                    <a href="https://umbramed.es" target="_blank" rel="noopener noreferrer" class="text-red-100 font-medium hover:text-white pb-1 flex items-center transition-colors">
+                        umbramed.es
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
                 </div>
                 
                 <!-- Mobile Menu (Hidden by default) -->
-                <div id="mobile-menu" class="hidden absolute top-full left-0 right-0 bg-betis-green border-t border-green-600 md:hidden">
+                <div id="mobile-menu" class="hidden absolute top-full left-0 right-0 bg-red-600 border-t border-red-500 md:hidden z-50 shadow-lg transform transition-all duration-200 ease-out">
                     <div class="flex flex-col p-4 space-y-2">
-                        <button onclick="switchView('specialties'); toggleMobileMenu()" class="text-white font-medium py-2 text-left hover:bg-green-700 px-3 rounded">🏠 Inicio</button>
-                        <button onclick="switchView('library'); toggleMobileMenu()" class="text-white font-medium py-2 text-left hover:bg-green-700 px-3 rounded">📚 Biblioteca</button>
-                        <button onclick="switchView('practice'); toggleMobileMenu()" class="text-white font-medium py-2 text-left hover:bg-green-700 px-3 rounded">🎯 Practicar</button>
+                        <button onclick="switchView('tools'); closeMobileMenu()" class="text-white font-medium py-2 text-left hover:bg-red-700 px-3 rounded transition-colors">🛠️ Herramientas</button>
+                        <a href="https://umbramed.es" target="_blank" class="text-white font-medium py-2 text-left hover:bg-red-700 px-3 rounded flex items-center transition-colors">
+                            🌐 umbramed.es
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
                     </div>
                 </div>
 
                 <div class="flex md:order-2 space-x-3 md:space-x-0 rtl:space-x-reverse">
-                    <button type="button" data-modal-target="question-modal" data-modal-toggle="question-modal" class="text-betis-green bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 text-center" onclick="openCreateModal()">
-                        Nueva Pregunta
-                    </button>
+                    <a href="https://umbramed.es" target="_blank" rel="noopener noreferrer" class="text-red-600 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-4 py-2 text-center flex items-center">
+                        Ir a umbramed.es
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
                 </div>
             </div>
         </nav>
@@ -181,7 +232,7 @@
             <!-- Exams View (New) -->
             <div id="exams-view" class="hidden">
                 <div class="flex items-center mb-6">
-                    <button onclick="switchView('specialties')" class="mr-4 text-gray-500 hover:text-betis-green">
+                    <button onclick="switchView('specialties')" class="mr-4 text-gray-500 hover:text-red-600">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                     </button>
                     <h2 class="text-2xl font-bold text-gray-900 dark:text-white" id="selected-specialty-title">Especialidad</h2>
@@ -204,14 +255,14 @@
                                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
                                     </svg>
                                 </div>
-                                <input type="text" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full ps-10 p-2.5" placeholder="Buscar pregunta..." required>
+                                <input type="text" id="simple-search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full ps-10 p-2.5" placeholder="Buscar pregunta..." required>
                             </div>
                         </form>
                     </div>
 
                     <div class="w-full md:w-auto flex flex-wrap items-center justify-end gap-3">
                         <label for="sort-select" class="sr-only">Ordenar</label>
-                        <select id="sort-select" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full md:w-auto p-2.5">
+                        <select id="sort-select" class="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full md:w-auto p-2.5">
                             <option value="Question Number-asc" selected>Número (↑)</option>
                             <option value="Question Number-desc">Número (↓)</option>
                             <option value="Question Text-asc">Pregunta (A-Z)</option>
@@ -261,6 +312,13 @@
 
             <!-- Practice View (New) -->
             <div id="practice-view" class="hidden max-w-3xl mx-auto">
+                <!-- Back Button -->
+                <div class="flex items-center mb-4">
+                    <button onclick="goBackFromPractice()" class="mr-4 text-gray-500 hover:text-red-600 transition-colors flex items-center">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                        <span class="ml-2 text-sm font-medium">Volver</span>
+                    </button>
+                </div>
                 <div class="bg-white rounded-lg shadow-lg p-6 md:p-8">
                     <!-- Progress Header -->
                     <div class="flex justify-between items-center mb-6">
@@ -286,8 +344,282 @@
                     <!-- Actions -->
                     <div class="flex justify-between items-center mt-8 pt-4 border-t border-gray-100">
                         <button onclick="prevQuestion()" class="text-gray-500 hover:text-gray-900 font-medium text-sm px-5 py-2.5">Anterior</button>
-                        <button onclick="checkAnswer()" id="check-btn" class="text-white bg-betis-green hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5">Comprobar</button>
+                        <button onclick="checkAnswer()" id="check-btn" class="text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5">Comprobar</button>
                         <button onclick="nextQuestion()" id="next-btn" class="hidden text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5">Siguiente</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tools View -->
+            <div id="tools-view" class="hidden">
+                <h2 class="text-2xl font-bold mb-6 text-gray-900">Herramientas Clínicas</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                    <!-- Pediatric Dosing Card -->
+                    <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer border border-gray-100" onclick="switchView('pediatric-dosing')">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            </div>
+                            <span class="text-xs font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">Pediatría</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">Dosificación Pediátrica</h3>
+                        <p class="text-sm text-gray-500">Calculadora de dosis de medicamentos por peso y edad</p>
+                    </div>
+                    
+                    <!-- IMC Calculator Card -->
+                    <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer border border-gray-100" onclick="switchView('imc-calculator')">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                            </div>
+                            <span class="text-xs font-medium text-purple-600 bg-purple-50 px-2 py-1 rounded-full">General</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">Calculadora IMC</h3>
+                        <p class="text-sm text-gray-500">Índice de masa corporal y clasificación</p>
+                    </div>
+                    
+                    <!-- Clearance Card -->
+                    <div class="bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow cursor-pointer border border-gray-100" onclick="switchView('clearance-calculator')">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                            </div>
+                            <span class="text-xs font-medium text-orange-600 bg-orange-50 px-2 py-1 rounded-full">Nefrología</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-900 mb-1">Aclaramiento Creatinina</h3>
+                        <p class="text-sm text-gray-500">Fórmulas Cockcroft-Gault y CKD-EPI</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pediatric Dosing View -->
+            <div id="pediatric-dosing-view" class="hidden">
+                <div class="flex items-center mb-6">
+                    <button onclick="switchView('tools')" class="mr-4 text-gray-500 hover:text-red-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-900">Dosificación Pediátrica</h2>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Calculator Panel -->
+                    <div class="lg:col-span-1 bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold mb-4 text-gray-900">Calculadora</h3>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Peso del paciente (kg)</label>
+                                <input type="number" id="ped-weight" step="0.1" min="0.5" max="150" placeholder="Ej: 12.5" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                            </div>
+                            
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Edad</label>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="number" id="ped-age-years" min="0" max="18" placeholder="Años" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                                    <input type="number" id="ped-age-months" min="0" max="11" placeholder="Meses" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Buscar medicamento</label>
+                                <input type="text" id="ped-drug-search" placeholder="Ej: Amoxicilina, Ibuprofeno..." class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" oninput="filterPedDrugs()">
+                            </div>
+                            
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Medicamento</label>
+                                <select id="ped-drug-select" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" onchange="selectPedDrug()">
+                                    <option value="">Seleccionar medicamento...</option>
+                                </select>
+                            </div>
+                            
+                            <button onclick="calculatePedDose()" class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-3">
+                                Calcular Dosis
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Results Panel -->
+                    <div class="lg:col-span-2 bg-white rounded-lg shadow p-6">
+                        <h3 class="text-lg font-bold mb-4 text-gray-900">Resultado del Cálculo</h3>
+                        
+                        <div id="ped-result" class="hidden">
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                <div class="flex items-center mb-2">
+                                    <span class="text-2xl mr-3">💊</span>
+                                    <div>
+                                        <h4 class="text-lg font-bold text-blue-900" id="ped-result-drug">Medicamento</h4>
+                                        <p class="text-sm text-blue-700" id="ped-result-indication">Indicación</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                                    <p class="text-sm text-green-600 mb-1">Dosis por toma</p>
+                                    <p class="text-2xl font-bold text-green-800" id="ped-result-dose">--</p>
+                                </div>
+                                <div class="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                                    <p class="text-sm text-purple-600 mb-1">Dosis diaria total</p>
+                                    <p class="text-2xl font-bold text-purple-800" id="ped-result-daily">--</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <h5 class="font-bold text-gray-900 mb-2">Posología</h5>
+                                <p class="text-gray-700" id="ped-result-posology">--</p>
+                            </div>
+                            
+                            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                                <h5 class="font-bold text-yellow-800 mb-2">⚠️ Advertencias</h5>
+                                <ul class="text-sm text-yellow-700 list-disc list-inside" id="ped-result-warnings">
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-gray-100 rounded-lg p-4">
+                                <h5 class="font-bold text-gray-900 mb-2">Presentaciones disponibles</h5>
+                                <div id="ped-result-presentations" class="text-sm text-gray-700"></div>
+                            </div>
+                        </div>
+                        
+                        <div id="ped-no-result" class="text-center py-12 text-gray-500">
+                            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+                            <p>Ingresa el peso del paciente y selecciona un medicamento para ver la dosis calculada</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Drug Reference Table -->
+                <div class="mt-8 bg-white rounded-lg shadow p-6">
+                    <h3 class="text-lg font-bold mb-4 text-gray-900">Vademécum Pediátrico</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm text-left text-gray-500">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-3">Medicamento</th>
+                                    <th class="px-4 py-3">Categoría</th>
+                                    <th class="px-4 py-3">Dosis (mg/kg/día)</th>
+                                    <th class="px-4 py-3">Frecuencia</th>
+                                    <th class="px-4 py-3">Dosis Máx.</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ped-drug-table">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IMC Calculator View -->
+            <div id="imc-calculator-view" class="hidden">
+                <div class="flex items-center mb-6">
+                    <button onclick="switchView('tools')" class="mr-4 text-gray-500 hover:text-red-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-900">Calculadora de IMC</h2>
+                </div>
+                
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Peso (kg)</label>
+                                <input type="number" id="imc-weight" step="0.1" min="1" placeholder="Ej: 70" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Altura (cm)</label>
+                                <input type="number" id="imc-height" step="1" min="50" placeholder="Ej: 170" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                            </div>
+                        </div>
+                        
+                        <button onclick="calculateIMC()" class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-3 mb-6">
+                            Calcular IMC
+                        </button>
+                        
+                        <div id="imc-result" class="hidden">
+                            <div class="text-center mb-6">
+                                <p class="text-5xl font-bold text-red-600" id="imc-value">--</p>
+                                <p class="text-lg text-gray-600" id="imc-category">--</p>
+                            </div>
+                            
+                            <div class="bg-gray-100 rounded-lg p-4">
+                                <h4 class="font-bold mb-2">Clasificación OMS</h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex justify-between"><span>Bajo peso</span><span>&lt; 18.5</span></div>
+                                    <div class="flex justify-between"><span>Normal</span><span>18.5 - 24.9</span></div>
+                                    <div class="flex justify-between"><span>Sobrepeso</span><span>25 - 29.9</span></div>
+                                    <div class="flex justify-between"><span>Obesidad I</span><span>30 - 34.9</span></div>
+                                    <div class="flex justify-between"><span>Obesidad II</span><span>35 - 39.9</span></div>
+                                    <div class="flex justify-between"><span>Obesidad III</span><span>≥ 40</span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Creatinine Clearance Calculator View -->
+            <div id="clearance-calculator-view" class="hidden">
+                <div class="flex items-center mb-6">
+                    <button onclick="switchView('tools')" class="mr-4 text-gray-500 hover:text-red-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-900">Aclaramiento de Creatinina</h2>
+                </div>
+                
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Edad (años)</label>
+                                <input type="number" id="clcr-age" min="18" max="120" placeholder="Ej: 65" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Peso (kg)</label>
+                                <input type="number" id="clcr-weight" step="0.1" min="30" placeholder="Ej: 70" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Creatinina sérica (mg/dL)</label>
+                                <input type="number" id="clcr-creatinine" step="0.1" min="0.1" placeholder="Ej: 1.2" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                            </div>
+                            <div>
+                                <label class="block mb-2 text-sm font-medium text-gray-900">Sexo</label>
+                                <select id="clcr-sex" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
+                                    <option value="male">Masculino</option>
+                                    <option value="female">Femenino</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button onclick="calculateClearance()" class="w-full text-white bg-red-600 hover:bg-red-700 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-3 mb-6">
+                            Calcular Aclaramiento
+                        </button>
+                        
+                        <div id="clcr-result" class="hidden">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+                                    <p class="text-sm text-blue-600 mb-1">Cockcroft-Gault</p>
+                                    <p class="text-3xl font-bold text-blue-800" id="clcr-cg">--</p>
+                                    <p class="text-sm text-blue-600">mL/min</p>
+                                </div>
+                                <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+                                    <p class="text-sm text-green-600 mb-1">Estadio ERC</p>
+                                    <p class="text-3xl font-bold text-green-800" id="clcr-stage">--</p>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-100 rounded-lg p-4">
+                                <h4 class="font-bold mb-2">Estadios de ERC (KDIGO)</h4>
+                                <div class="space-y-1 text-sm">
+                                    <div class="flex justify-between"><span>G1 - Normal/Alto</span><span>≥ 90 mL/min</span></div>
+                                    <div class="flex justify-between"><span>G2 - Ligeramente disminuido</span><span>60-89 mL/min</span></div>
+                                    <div class="flex justify-between"><span>G3a - Leve-moderado</span><span>45-59 mL/min</span></div>
+                                    <div class="flex justify-between"><span>G3b - Moderado-grave</span><span>30-44 mL/min</span></div>
+                                    <div class="flex justify-between"><span>G4 - Gravemente disminuido</span><span>15-29 mL/min</span></div>
+                                    <div class="flex justify-between"><span>G5 - Fallo renal</span><span>&lt; 15 mL/min</span></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -298,20 +630,14 @@
     <!-- Footer -->
     <footer class="bg-white rounded-lg shadow m-4 dark:bg-gray-800">
         <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
-          <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2025 <a href="#" class="hover:underline">Umbramed Academy™</a>. All Rights Reserved.
+          <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© 2025 <a href="https://umbramed.es" target="_blank" class="hover:underline text-red-600">Umbramed™</a>. Todos los derechos reservados.
         </span>
         <ul class="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
             <li>
-                <a href="#" class="hover:underline me-4 md:me-6">About</a>
+                <a href="https://umbramed.es" target="_blank" class="hover:underline me-4 md:me-6 text-red-600">umbramed.es</a>
             </li>
             <li>
-                <a href="#" class="hover:underline me-4 md:me-6">Privacy Policy</a>
-            </li>
-            <li>
-                <a href="#" class="hover:underline me-4 md:me-6">Licensing</a>
-            </li>
-            <li>
-                <a href="#" class="hover:underline">Contact</a>
+                <a href="https://umbramed.es/contacto" target="_blank" class="hover:underline">Contacto</a>
             </li>
         </ul>
         </div>
@@ -341,27 +667,27 @@
                         <div class="grid gap-4 mb-4 grid-cols-2">
                             <div class="col-span-2">
                                 <label for="question-text" class="block mb-2 text-sm font-medium text-gray-900">Texto de la Pregunta</label>
-                                <textarea id="question-text" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-betis-green focus:border-betis-green" placeholder="Escriba la pregunta aquí..." required></textarea>
+                                <textarea id="question-text" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-red-500 focus:border-red-500" placeholder="Escriba la pregunta aquí..." required></textarea>
                             </div>
                             <div class="col-span-1">
                                 <label for="option-a" class="block mb-2 text-sm font-medium text-gray-900">Opción A</label>
-                                <input type="text" id="option-a" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5" required>
+                                <input type="text" id="option-a" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" required>
                             </div>
                             <div class="col-span-1">
                                 <label for="option-b" class="block mb-2 text-sm font-medium text-gray-900">Opción B</label>
-                                <input type="text" id="option-b" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5" required>
+                                <input type="text" id="option-b" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" required>
                             </div>
                             <div class="col-span-1">
                                 <label for="option-c" class="block mb-2 text-sm font-medium text-gray-900">Opción C</label>
-                                <input type="text" id="option-c" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5" required>
+                                <input type="text" id="option-c" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" required>
                             </div>
                             <div class="col-span-1">
                                 <label for="option-d" class="block mb-2 text-sm font-medium text-gray-900">Opción D</label>
-                                <input type="text" id="option-d" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5" required>
+                                <input type="text" id="option-d" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5" required>
                             </div>
                             <div class="col-span-1">
                                 <label for="correct-answer" class="block mb-2 text-sm font-medium text-gray-900">Respuesta Correcta</label>
-                                <select id="correct-answer" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5">
+                                <select id="correct-answer" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
                                     <option value="A">A</option>
                                     <option value="B">B</option>
                                     <option value="C">C</option>
@@ -370,10 +696,10 @@
                             </div>
                             <div class="col-span-1">
                                 <label for="question-number" class="block mb-2 text-sm font-medium text-gray-900">Número de Pregunta</label>
-                                <input type="number" id="question-number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-betis-green focus:border-betis-green block w-full p-2.5">
+                                <input type="number" id="question-number" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-red-500 focus:border-red-500 block w-full p-2.5">
                             </div>
                         </div>
-                        <button type="submit" class="text-white inline-flex items-center bg-betis-green hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
+                        <button type="submit" class="text-white inline-flex items-center bg-red-600 hover:bg-red-700 focus:ring-4 focus:outline-none focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                             <svg class="me-1 -ms-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
                             Guardar Pregunta
                         </button>

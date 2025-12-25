@@ -23,41 +23,46 @@ const { chromium } = require('playwright');
         process.exit(1);
     }
     
-    // Click on "Empezar Ahora"
-    console.log('3. Clicking "Empezar Ahora"...');
-    await page.click('text=Empezar Ahora');
+    // Click on "Acceder a Herramientas"
+    console.log('3. Clicking "Acceder a Herramientas"...');
+    await page.click('text=Acceder a Herramientas');
     
     // Wait for app layout to be visible
     await page.waitForSelector('#app-layout:not(.hidden)', { timeout: 5000 });
     console.log('4. App layout is now visible');
     
-    // Wait for the table to load (data fetching)
-    console.log('5. Waiting for questions to load...');
-    await page.waitForSelector('#questions-table-body tr', { timeout: 15000 });
-    await page.waitForTimeout(500);
+    // Wait for the tools view to be visible
+    console.log('5. Waiting for tools view to load...');
+    await page.waitForSelector('#tools-view:not(.hidden)', { timeout: 5000 });
     
-    // Count rows in the table
-    const rows = await page.locator('#questions-table-body tr').count();
-    console.log(`6. Table has ${rows} rows`);
+    // Verify the tools view contains the expected tools
+    const toolsTitle = await page.locator('#tools-view h2').textContent();
+    console.log(`6. Tools view title: ${toolsTitle}`);
     
-    if (rows > 0) {
-        // Check if we have actual data (not error message)
-        const firstRowText = await page.locator('#questions-table-body tr:first-child').textContent();
-        if (firstRowText.includes('Error')) {
-            console.error('FAIL: Error loading data');
-            console.log('Row content:', firstRowText);
+    // Count the tool cards
+    const toolCards = await page.locator('#tools-view .grid > div').count();
+    console.log(`7. Found ${toolCards} tool cards`);
+    
+    if (toolCards >= 3) {
+        // Check if the expected tools are present within the tools-view
+        const hasPediatric = await page.locator('#tools-view h3:has-text("Dosificación Pediátrica")').isVisible();
+        const hasIMC = await page.locator('#tools-view h3:has-text("Calculadora IMC")').isVisible();
+        const hasClearance = await page.locator('#tools-view h3:has-text("Aclaramiento Creatinina")').isVisible();
+        
+        if (hasPediatric && hasIMC && hasClearance) {
+            console.log('8. SUCCESS: All expected tools are present!');
+        } else {
+            console.error('FAIL: Some tools are missing');
             await browser.close();
             process.exit(1);
         }
-        console.log('7. SUCCESS: Questions loaded correctly!');
-        console.log('First row preview:', firstRowText.substring(0, 100) + '...');
     } else {
-        console.error('FAIL: No rows found');
+        console.error('FAIL: Expected at least 3 tool cards');
         await browser.close();
         process.exit(1);
     }
     
     await browser.close();
-    console.log('8. Test completed successfully!');
+    console.log('9. Test completed successfully!');
     process.exit(0);
 })();

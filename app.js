@@ -9,21 +9,58 @@ let isEditing = false;
 let currentEditId = null;
 let deleteId = null;
 
+// Navigation history stack for back navigation
+let navigationHistory = ['tools'];
+
 // Navigation & View Logic
-window.enterApp = function(view = 'specialties') {
+window.enterApp = function(view = 'tools') {
     document.getElementById('landing-page').classList.add('hidden');
     document.getElementById('app-layout').classList.remove('hidden');
-    switchView(view);
+    navigationHistory = [view];
+    switchView(view, false);
+    
+    // Update URL hash for browser history
+    updateUrlHash(view);
 }
 
 window.showLanding = function() {
     document.getElementById('app-layout').classList.add('hidden');
     document.getElementById('landing-page').classList.remove('hidden');
+    navigationHistory = [];
+    window.history.pushState({ view: 'landing' }, '', '#');
 }
 
-window.switchView = function(viewName) {
-    // Hide all views
-    ['specialties-view', 'exams-view', 'library-view', 'practice-view'].forEach(id => {
+// Helper to update URL hash
+function updateUrlHash(viewName) {
+    const hash = viewName || 'tools';
+    if (window.location.hash !== `#${hash}`) {
+        window.history.pushState({ view: viewName }, '', `#${viewName}`);
+    }
+}
+
+// Handle browser back/forward buttons
+window.addEventListener('popstate', function(event) {
+    if (event.state && event.state.view) {
+        if (event.state.view === 'landing') {
+            showLanding();
+        } else {
+            const landingPage = document.getElementById('landing-page');
+            const appLayout = document.getElementById('app-layout');
+            
+            if (!landingPage.classList.contains('hidden')) {
+                landingPage.classList.add('hidden');
+                appLayout.classList.remove('hidden');
+            }
+            switchView(event.state.view, false);
+        }
+    }
+});
+
+window.switchView = function(viewName, addToHistory = true) {
+    // Hide all views with fade out effect
+    const allViews = ['specialties-view', 'exams-view', 'library-view', 'practice-view', 'tools-view', 'pediatric-dosing-view', 'imc-calculator-view', 'clearance-calculator-view'];
+    
+    allViews.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
     });
@@ -31,18 +68,35 @@ window.switchView = function(viewName) {
     // Show selected view
     const viewId = viewName.endsWith('-view') ? viewName : `${viewName}-view`;
     const el = document.getElementById(viewId);
-    if (el) el.classList.remove('hidden');
+    if (el) {
+        el.classList.remove('hidden');
+    }
 
-    // Update Nav State
+    // Update Nav State - highlight correct nav button
     document.querySelectorAll('nav button[id^="nav-"]').forEach(btn => {
         btn.classList.remove('text-white', 'border-b-2', 'border-white');
-        btn.classList.add('text-green-100');
+        btn.classList.add('text-red-100');
     });
     
-    const navBtn = document.getElementById(`nav-${viewName}`);
+    // Determine which nav button to highlight
+    let navKey = viewName;
+    if (['pediatric-dosing', 'imc-calculator', 'clearance-calculator', 'practice'].includes(viewName)) {
+        navKey = 'tools';
+    }
+    
+    const navBtn = document.getElementById(`nav-${navKey}`);
     if (navBtn) {
-        navBtn.classList.remove('text-green-100');
+        navBtn.classList.remove('text-red-100');
         navBtn.classList.add('text-white', 'border-b-2', 'border-white');
+    }
+
+    // Add to navigation history for back button support
+    if (addToHistory) {
+        // Don't add if it's the same as the last view
+        if (navigationHistory[navigationHistory.length - 1] !== viewName) {
+            navigationHistory.push(viewName);
+        }
+        updateUrlHash(viewName);
     }
 
     // View specific logic
@@ -50,13 +104,90 @@ window.switchView = function(viewName) {
         renderSpecialties();
     } else if (viewName === 'practice') {
         initPracticeMode();
+    } else if (viewName === 'pediatric-dosing') {
+        initPediatricDosing();
+    }
+    
+    // Scroll to top when switching views
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Go back from practice view
+window.goBackFromPractice = function() {
+    // Remove current view from history
+    if (navigationHistory.length > 1) {
+        navigationHistory.pop();
+        const previousView = navigationHistory[navigationHistory.length - 1];
+        switchView(previousView, false);
+    } else {
+        switchView('tools', false);
+    }
+    // Reset practice questions so next time it loads fresh
+    practiceQuestions = [];
+}
+
+// Mobile menu functions
+window.toggleMobileMenu = function(event) {
+    if (event) event.stopPropagation();
+    
+    const menu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const iconOpen = document.getElementById('menu-icon-open');
+    const iconClose = document.getElementById('menu-icon-close');
+    
+    if (menu) {
+        const isHidden = menu.classList.contains('hidden');
+        
+        if (isHidden) {
+            // Show menu
+            menu.classList.remove('hidden');
+            if (overlay) overlay.classList.remove('hidden');
+            if (iconOpen) iconOpen.classList.add('hidden');
+            if (iconClose) iconClose.classList.remove('hidden');
+        } else {
+            closeMobileMenu();
+        }
     }
 }
 
-window.toggleMobileMenu = function() {
+window.closeMobileMenu = function() {
     const menu = document.getElementById('mobile-menu');
-    if (menu) menu.classList.toggle('hidden');
+    const overlay = document.getElementById('mobile-menu-overlay');
+    const iconOpen = document.getElementById('menu-icon-open');
+    const iconClose = document.getElementById('menu-icon-close');
+    
+    if (menu) menu.classList.add('hidden');
+    if (overlay) overlay.classList.add('hidden');
+    if (iconOpen) iconOpen.classList.remove('hidden');
+    if (iconClose) iconClose.classList.add('hidden');
 }
+
+// Close mobile menu when clicking outside
+document.addEventListener('click', function(event) {
+    const menu = document.getElementById('mobile-menu');
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    
+    if (menu && !menu.classList.contains('hidden')) {
+        if (!menu.contains(event.target) && !menuBtn.contains(event.target)) {
+            closeMobileMenu();
+        }
+    }
+});
+
+// Close mobile menu on escape key
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape') {
+        closeMobileMenu();
+    }
+});
+
+// Handle initial URL hash on page load
+window.addEventListener('DOMContentLoaded', function() {
+    const hash = window.location.hash.slice(1);
+    if (hash && hash !== 'landing') {
+        enterApp(hash);
+    }
+});
 
 function renderSpecialties() {
     const grid = document.getElementById('specialties-grid');
@@ -156,15 +287,8 @@ function showPracticeQuestion() {
 }
 
 let selectedOption = null;
-window.s
-        // Update UI based on current view
-        const currentView = document.querySelector('div[id$="-view"]:not(.hidden)');
-        if (currentView && currentView.id === 'specialties-view') {
-            renderSpecialties();
-        } else {
-            renderTable();
-        }
-        function(opt) {
+
+window.selectOption = function(opt) {
     if (document.getElementById('exam-feedback').classList.contains('hidden') === false) return; // Already checked
     
     selectedOption = opt;
@@ -637,10 +761,13 @@ async function executeDelete() {
         const response = await fetch(`${API_URL}/${deleteId}`, {
             method: 'DELETE',
             headers: {
-                'Authorization': `Bearer ${API_KEY}`
+                'Content-Type': 'application/json'
             }
         });
-eModal.hide();
+        
+        if (!response.ok) throw new Error('Error deleting data');
+        
+        deleteModal.hide();
         deleteId = null;
         showToast('Pregunta eliminada correctamente');
         
@@ -653,4 +780,285 @@ eModal.hide();
         console.error('Error deleting:', error);
         showToast('Error al eliminar. Revisa la consola.', 'error');
     }
+}
+
+// ===== PEDIATRIC DOSING DATABASE =====
+const PEDIATRIC_DRUGS = [
+    // ANTIBIÓTICOS
+    { name: 'Amoxicilina', category: 'Antibiótico', dosePerKg: 50, frequency: 'cada 8h', maxDose: 3000, unit: 'mg', indications: 'Infecciones respiratorias, otitis media, faringitis', presentations: ['Suspensión 250mg/5mL', 'Suspensión 500mg/5mL', 'Cápsulas 500mg'], warnings: ['Alergia a penicilinas', 'Ajustar en insuficiencia renal'] },
+    { name: 'Amoxicilina/Ác. Clavulánico', category: 'Antibiótico', dosePerKg: 50, frequency: 'cada 8h', maxDose: 3000, unit: 'mg', indications: 'Infecciones respiratorias complicadas, sinusitis, otitis resistente', presentations: ['Suspensión 250/62.5mg/5mL', 'Suspensión 400/57mg/5mL', 'Comprimidos 875/125mg'], warnings: ['Alergia a penicilinas', 'Hepatotoxicidad', 'Diarrea'] },
+    { name: 'Azitromicina', category: 'Antibiótico', dosePerKg: 10, frequency: 'cada 24h x 3-5 días', maxDose: 500, unit: 'mg', indications: 'Infecciones respiratorias, otitis, faringitis en alérgicos a penicilina', presentations: ['Suspensión 200mg/5mL', 'Comprimidos 500mg'], warnings: ['Prolongación QT', 'Interacciones medicamentosas'] },
+    { name: 'Claritromicina', category: 'Antibiótico', dosePerKg: 15, frequency: 'cada 12h', maxDose: 1000, unit: 'mg', indications: 'Infecciones respiratorias, H. pylori', presentations: ['Suspensión 125mg/5mL', 'Suspensión 250mg/5mL', 'Comprimidos 500mg'], warnings: ['Prolongación QT', 'Interacciones con estatinas'] },
+    { name: 'Cefuroxima', category: 'Antibiótico', dosePerKg: 30, frequency: 'cada 12h', maxDose: 1000, unit: 'mg', indications: 'Infecciones respiratorias, ORL, piel', presentations: ['Suspensión 125mg/5mL', 'Suspensión 250mg/5mL', 'Comprimidos 500mg'], warnings: ['Alergia a cefalosporinas', 'Reacción cruzada con penicilinas 1-2%'] },
+    { name: 'Cefixima', category: 'Antibiótico', dosePerKg: 8, frequency: 'cada 12-24h', maxDose: 400, unit: 'mg', indications: 'ITU, infecciones respiratorias, otitis', presentations: ['Suspensión 100mg/5mL', 'Cápsulas 400mg'], warnings: ['Alergia a cefalosporinas', 'Colitis pseudomembranosa'] },
+    { name: 'Ceftriaxona', category: 'Antibiótico', dosePerKg: 50, frequency: 'cada 24h IV/IM', maxDose: 4000, unit: 'mg', indications: 'Meningitis, sepsis, infecciones graves', presentations: ['Vial 250mg', 'Vial 1g', 'Vial 2g'], warnings: ['No usar en neonatos con ictericia', 'No mezclar con calcio IV'] },
+    { name: 'Trimetoprim/Sulfametoxazol', category: 'Antibiótico', dosePerKg: 8, frequency: 'cada 12h (TMP)', maxDose: 320, unit: 'mg TMP', indications: 'ITU, infecciones respiratorias, Pneumocystis', presentations: ['Suspensión 40/200mg/5mL', 'Comprimidos 80/400mg', 'Comprimidos Forte 160/800mg'], warnings: ['Alergia a sulfas', 'Hiperpotasemia', 'Toxicidad hematológica'] },
+    { name: 'Ciprofloxacino', category: 'Antibiótico', dosePerKg: 20, frequency: 'cada 12h', maxDose: 1500, unit: 'mg', indications: 'ITU complicada, infecciones graves (uso restringido en pediatría)', presentations: ['Suspensión 250mg/5mL', 'Comprimidos 500mg', 'Comprimidos 750mg'], warnings: ['Tendinopatía', 'Artropatía en niños', 'Fotosensibilidad'] },
+    { name: 'Gentamicina', category: 'Antibiótico', dosePerKg: 5, frequency: 'cada 24h IV/IM', maxDose: 400, unit: 'mg', indications: 'Infecciones graves por gram negativos', presentations: ['Ampolla 80mg/2mL', 'Ampolla 20mg/2mL'], warnings: ['Nefrotoxicidad', 'Ototoxicidad', 'Monitorizar niveles'] },
+    { name: 'Vancomicina', category: 'Antibiótico', dosePerKg: 40, frequency: 'cada 6h IV', maxDose: 4000, unit: 'mg', indications: 'Infecciones por MRSA, meningitis', presentations: ['Vial 500mg', 'Vial 1g'], warnings: ['Síndrome del hombre rojo', 'Nefrotoxicidad', 'Monitorizar niveles'] },
+    { name: 'Clindamicina', category: 'Antibiótico', dosePerKg: 30, frequency: 'cada 8h', maxDose: 1800, unit: 'mg', indications: 'Infecciones de piel, hueso, anaerobios', presentations: ['Solución oral 75mg/5mL', 'Cápsulas 300mg'], warnings: ['Colitis pseudomembranosa', 'Diarrea'] },
+    { name: 'Metronidazol', category: 'Antibiótico', dosePerKg: 30, frequency: 'cada 8h', maxDose: 2000, unit: 'mg', indications: 'Infecciones anaerobias, Giardia, Clostridium difficile', presentations: ['Suspensión 125mg/5mL', 'Comprimidos 250mg', 'Comprimidos 500mg'], warnings: ['Efecto antabús', 'Neuropatía periférica'] },
+    { name: 'Nitrofurantoína', category: 'Antibiótico', dosePerKg: 5, frequency: 'cada 6h', maxDose: 400, unit: 'mg', indications: 'ITU baja, profilaxis ITU', presentations: ['Suspensión 25mg/5mL', 'Cápsulas 50mg', 'Cápsulas 100mg'], warnings: ['Neuropatía periférica', 'Fibrosis pulmonar (uso prolongado)', 'Contraindicado <1 mes'] },
+    { name: 'Fosfomicina', category: 'Antibiótico', dosePerKg: 100, frequency: 'cada 8h', maxDose: 3000, unit: 'mg', indications: 'ITU, infecciones urinarias no complicadas', presentations: ['Sobres 3g (dosis única adultos)', 'Suspensión oral'], warnings: ['Diarrea', 'Cefalea'] },
+
+    // ANALGÉSICOS Y ANTIPIRÉTICOS
+    { name: 'Paracetamol', category: 'Analgésico/Antipirético', dosePerKg: 15, frequency: 'cada 4-6h', maxDose: 4000, unit: 'mg', indications: 'Fiebre, dolor leve-moderado', presentations: ['Gotas 100mg/mL', 'Jarabe 120mg/5mL', 'Jarabe 160mg/5mL', 'Supositorios', 'Comprimidos 500mg'], warnings: ['Hepatotoxicidad en sobredosis', 'Máx 5 dosis/día'] },
+    { name: 'Ibuprofeno', category: 'AINE', dosePerKg: 10, frequency: 'cada 6-8h', maxDose: 2400, unit: 'mg', indications: 'Fiebre, dolor, inflamación', presentations: ['Suspensión 100mg/5mL', 'Suspensión 200mg/5mL', 'Comprimidos 400mg', 'Comprimidos 600mg'], warnings: ['Gastropatía', 'Nefrotoxicidad', 'Evitar en deshidratación', 'Contraindicado <6 meses'] },
+    { name: 'Metamizol (Dipirona)', category: 'Analgésico/Antipirético', dosePerKg: 15, frequency: 'cada 6-8h', maxDose: 4000, unit: 'mg', indications: 'Dolor moderado-severo, fiebre refractaria', presentations: ['Gotas 500mg/mL', 'Cápsulas 575mg', 'Ampollas 2g/5mL'], warnings: ['Agranulocitosis (rara)', 'Hipotensión IV', 'Contraindicado <3 meses'] },
+    { name: 'Naproxeno', category: 'AINE', dosePerKg: 10, frequency: 'cada 12h', maxDose: 1000, unit: 'mg', indications: 'Dolor, inflamación, artritis juvenil', presentations: ['Suspensión 125mg/5mL', 'Comprimidos 250mg', 'Comprimidos 500mg'], warnings: ['Gastropatía', 'Nefrotoxicidad', 'Mayor riesgo cardiovascular'] },
+    { name: 'Ketorolaco', category: 'AINE', dosePerKg: 0.5, frequency: 'cada 6h (max 2 días)', maxDose: 40, unit: 'mg', indications: 'Dolor postoperatorio moderado-severo', presentations: ['Comprimidos 10mg', 'Ampollas 30mg/mL'], warnings: ['Uso máximo 2 días', 'Alto riesgo GI', 'Contraindicado <16 años para oral'] },
+    { name: 'Tramadol', category: 'Opioide débil', dosePerKg: 2, frequency: 'cada 6-8h', maxDose: 400, unit: 'mg', indications: 'Dolor moderado-severo', presentations: ['Gotas 100mg/mL', 'Cápsulas 50mg'], warnings: ['Depresión respiratoria', 'Náuseas', 'Estreñimiento', '>12 años generalmente'] },
+    { name: 'Morfina', category: 'Opioide', dosePerKg: 0.1, frequency: 'cada 4h IV/SC', maxDose: 15, unit: 'mg/dosis', indications: 'Dolor severo, cuidados paliativos', presentations: ['Ampollas 10mg/mL', 'Solución oral 2mg/mL'], warnings: ['Depresión respiratoria', 'Monitorización continua', 'Estreñimiento'] },
+
+    // ANTIHISTAMÍNICOS
+    { name: 'Cetirizina', category: 'Antihistamínico', dosePerKg: 0.25, frequency: 'cada 24h', maxDose: 10, unit: 'mg', indications: 'Rinitis alérgica, urticaria', presentations: ['Gotas 10mg/mL', 'Jarabe 5mg/5mL', 'Comprimidos 10mg'], warnings: ['Somnolencia (menos que 1ª generación)', 'Ajustar en insuficiencia renal'] },
+    { name: 'Loratadina', category: 'Antihistamínico', dosePerKg: 0.2, frequency: 'cada 24h', maxDose: 10, unit: 'mg', indications: 'Rinitis alérgica, urticaria', presentations: ['Jarabe 5mg/5mL', 'Comprimidos 10mg'], warnings: ['Baja sedación', 'Seguro en pediatría'] },
+    { name: 'Desloratadina', category: 'Antihistamínico', dosePerKg: 0.1, frequency: 'cada 24h', maxDose: 5, unit: 'mg', indications: 'Rinitis alérgica, urticaria crónica', presentations: ['Jarabe 0.5mg/mL', 'Comprimidos 5mg'], warnings: ['Mínima sedación'] },
+    { name: 'Difenhidramina', category: 'Antihistamínico', dosePerKg: 5, frequency: 'cada 6-8h', maxDose: 300, unit: 'mg', indications: 'Reacciones alérgicas, urticaria, sedación', presentations: ['Jarabe 12.5mg/5mL', 'Cápsulas 25mg', 'Ampollas 50mg/mL'], warnings: ['Sedación marcada', 'Efectos anticolinérgicos', 'Excitación paradójica en niños'] },
+    { name: 'Hidroxicina', category: 'Antihistamínico', dosePerKg: 2, frequency: 'cada 6-8h', maxDose: 100, unit: 'mg', indications: 'Prurito, urticaria, ansiedad', presentations: ['Jarabe 10mg/5mL', 'Comprimidos 25mg'], warnings: ['Sedación', 'Prolongación QT'] },
+    { name: 'Dexclorfeniramina', category: 'Antihistamínico', dosePerKg: 0.15, frequency: 'cada 6-8h', maxDose: 12, unit: 'mg', indications: 'Reacciones alérgicas, rinitis', presentations: ['Jarabe 2mg/5mL', 'Comprimidos 2mg', 'Ampollas 5mg/mL'], warnings: ['Sedación', 'Efectos anticolinérgicos'] },
+
+    // ANTITUSÍGENOS Y MUCOLÍTICOS
+    { name: 'Dextrometorfano', category: 'Antitusígeno', dosePerKg: 0.5, frequency: 'cada 6-8h', maxDose: 120, unit: 'mg', indications: 'Tos seca no productiva', presentations: ['Jarabe 15mg/5mL', 'Gotas'], warnings: ['No usar <2 años', 'Interacción con IMAO', 'Abuso potencial'] },
+    { name: 'Acetilcisteína', category: 'Mucolítico', dosePerKg: 10, frequency: 'cada 8h', maxDose: 600, unit: 'mg', indications: 'Tos productiva, fibrosis quística, intoxicación por paracetamol', presentations: ['Sobres 100mg', 'Sobres 200mg', 'Sobres 600mg', 'Ampollas IV'], warnings: ['Broncoespasmo en asmáticos', 'Náuseas'] },
+    { name: 'Ambroxol', category: 'Mucolítico', dosePerKg: 1.5, frequency: 'cada 8-12h', maxDose: 120, unit: 'mg', indications: 'Tos productiva, bronquitis', presentations: ['Jarabe 15mg/5mL', 'Jarabe 30mg/5mL', 'Comprimidos 30mg'], warnings: ['Bien tolerado', 'Posibles molestias GI'] },
+    { name: 'Carbocisteína', category: 'Mucolítico', dosePerKg: 15, frequency: 'cada 8h', maxDose: 2250, unit: 'mg', indications: 'Tos productiva', presentations: ['Jarabe 100mg/5mL', 'Jarabe 250mg/5mL'], warnings: ['Molestias gastrointestinales'] },
+
+    // BRONCODILATADORES
+    { name: 'Salbutamol (inhalado)', category: 'Broncodilatador', dosePerKg: 0, frequency: '2-4 puff cada 4-6h PRN', maxDose: 0, unit: 'puff', indications: 'Asma, broncoespasmo, bronquiolitis', presentations: ['MDI 100mcg/puff', 'Solución para nebulizar 5mg/mL'], warnings: ['Taquicardia', 'Temblor', 'Hipopotasemia'] },
+    { name: 'Salbutamol (nebulizado)', category: 'Broncodilatador', dosePerKg: 0.15, frequency: 'cada 20min x3, luego cada 4-6h', maxDose: 5, unit: 'mg', indications: 'Crisis asmática, broncoespasmo severo', presentations: ['Solución 5mg/mL'], warnings: ['Taquicardia', 'Temblor', 'Monitorizar potasio'] },
+    { name: 'Bromuro de Ipratropio', category: 'Anticolinérgico', dosePerKg: 0, frequency: '2-4 puff cada 6-8h', maxDose: 0, unit: 'puff', indications: 'Asma, EPOC, broncoespasmo', presentations: ['MDI 20mcg/puff', 'Solución nebulizar 250mcg/mL'], warnings: ['Sequedad bucal', 'Retención urinaria (rara)'] },
+    { name: 'Budesonida (inhalada)', category: 'Corticoide inhalado', dosePerKg: 0, frequency: '1-2 puff cada 12h', maxDose: 0, unit: 'mcg', indications: 'Asma persistente, control mantenimiento', presentations: ['MDI 100mcg', 'MDI 200mcg', 'Turbuhaler 200mcg', 'Nebulización 0.5mg/2mL'], warnings: ['Candidiasis oral', 'Enjuagar boca tras uso', 'Retraso crecimiento (dosis altas)'] },
+    { name: 'Fluticasona (inhalada)', category: 'Corticoide inhalado', dosePerKg: 0, frequency: '1-2 puff cada 12h', maxDose: 0, unit: 'mcg', indications: 'Asma persistente', presentations: ['MDI 50mcg', 'MDI 125mcg', 'MDI 250mcg'], warnings: ['Candidiasis oral', 'Enjuagar boca'] },
+    { name: 'Montelukast', category: 'Antileucotrieno', dosePerKg: 0, frequency: 'cada 24h', maxDose: 10, unit: 'mg', indications: 'Asma, rinitis alérgica', presentations: ['Sobres 4mg (6m-5a)', 'Comprimidos masticables 5mg (6-14a)', 'Comprimidos 10mg (>15a)'], warnings: ['Efectos neuropsiquiátricos (raros)', 'Monitorizar comportamiento'] },
+
+    // CORTICOIDES SISTÉMICOS
+    { name: 'Prednisona', category: 'Corticoide', dosePerKg: 1, frequency: 'cada 24h (mañana)', maxDose: 60, unit: 'mg', indications: 'Asma aguda, crup, enfermedades autoinmunes', presentations: ['Comprimidos 5mg', 'Comprimidos 10mg', 'Comprimidos 30mg'], warnings: ['No suspender bruscamente', 'Hiperglucemia', 'Inmunosupresión'] },
+    { name: 'Prednisolona', category: 'Corticoide', dosePerKg: 1, frequency: 'cada 24h', maxDose: 60, unit: 'mg', indications: 'Asma aguda, crup, alergia severa', presentations: ['Solución 15mg/5mL', 'Comprimidos 5mg'], warnings: ['Preferible a prednisona en niños pequeños (líquido)'] },
+    { name: 'Dexametasona', category: 'Corticoide', dosePerKg: 0.6, frequency: 'dosis única o cada 24h', maxDose: 16, unit: 'mg', indications: 'Crup, laringitis, edema cerebral, náuseas por QT', presentations: ['Ampollas 4mg/mL', 'Comprimidos 0.5mg', 'Comprimidos 4mg'], warnings: ['Muy potente', 'Vida media larga'] },
+    { name: 'Metilprednisolona', category: 'Corticoide', dosePerKg: 2, frequency: 'cada 6h IV (pulsos)', maxDose: 1000, unit: 'mg', indications: 'Crisis asmática severa, enfermedades autoinmunes', presentations: ['Vial 40mg', 'Vial 125mg', 'Vial 500mg', 'Vial 1g'], warnings: ['Uso hospitalario', 'Arritmias con infusión rápida'] },
+    { name: 'Hidrocortisona', category: 'Corticoide', dosePerKg: 4, frequency: 'cada 6-8h IV', maxDose: 300, unit: 'mg', indications: 'Insuficiencia suprarrenal, shock, anafilaxia', presentations: ['Vial 100mg', 'Vial 500mg'], warnings: ['Retención de sodio', 'Hipopotasemia'] },
+
+    // ANTIÁCIDOS Y GASTROPROTECTORES
+    { name: 'Omeprazol', category: 'IBP', dosePerKg: 1, frequency: 'cada 24h (antes desayuno)', maxDose: 40, unit: 'mg', indications: 'ERGE, úlcera péptica, gastritis', presentations: ['Cápsulas 10mg', 'Cápsulas 20mg', 'Sobres 10mg'], warnings: ['Hipomagnesemia (uso prolongado)', 'Infecciones GI'] },
+    { name: 'Lansoprazol', category: 'IBP', dosePerKg: 0.7, frequency: 'cada 24h', maxDose: 30, unit: 'mg', indications: 'ERGE, úlcera péptica', presentations: ['Cápsulas 15mg', 'Cápsulas 30mg', 'Comprimidos bucodispersables'], warnings: ['Similar a omeprazol'] },
+    { name: 'Ranitidina', category: 'Anti-H2', dosePerKg: 4, frequency: 'cada 12h', maxDose: 300, unit: 'mg', indications: 'ERGE, úlcera (alternativa a IBP)', presentations: ['Jarabe 75mg/5mL', 'Comprimidos 150mg', 'Comprimidos 300mg'], warnings: ['Retirada en algunos países por NDMA'] },
+    { name: 'Sucralfato', category: 'Protector gástrico', dosePerKg: 40, frequency: 'cada 6h (antes comidas)', maxDose: 4000, unit: 'mg', indications: 'Úlcera péptica, gastritis erosiva', presentations: ['Suspensión 1g/5mL', 'Comprimidos 1g'], warnings: ['Interfiere absorción otros fármacos', 'Tomar separado'] },
+    { name: 'Domperidona', category: 'Procinético', dosePerKg: 0.25, frequency: 'cada 8h', maxDose: 30, unit: 'mg', indications: 'Náuseas, vómitos, reflujo', presentations: ['Suspensión 5mg/5mL', 'Comprimidos 10mg'], warnings: ['Prolongación QT', 'Uso restringido'] },
+    { name: 'Metoclopramida', category: 'Procinético', dosePerKg: 0.15, frequency: 'cada 8h', maxDose: 30, unit: 'mg', indications: 'Náuseas, vómitos, gastroparesia', presentations: ['Gotas 2.6mg/mL', 'Comprimidos 10mg', 'Ampollas 10mg/2mL'], warnings: ['Síntomas extrapiramidales', 'Uso limitado en niños'] },
+    { name: 'Ondansetrón', category: 'Antiemético', dosePerKg: 0.15, frequency: 'cada 8h', maxDose: 24, unit: 'mg', indications: 'Náuseas y vómitos (QT, postoperatorio, gastroenteritis)', presentations: ['Comprimidos 4mg', 'Comprimidos 8mg', 'Ampollas 4mg/2mL', 'Comprimidos bucodispersables'], warnings: ['Prolongación QT', 'Estreñimiento'] },
+
+    // ANTIDIARREICOS Y REHIDRATACIÓN
+    { name: 'Suero de Rehidratación Oral', category: 'Rehidratación', dosePerKg: 75, frequency: 'en 4h (deshidratación leve)', maxDose: 0, unit: 'mL', indications: 'Deshidratación por gastroenteritis', presentations: ['Sobres para diluir en 1L', 'Solución lista'], warnings: ['Ajustar según grado deshidratación', 'Ofrecer frecuentemente'] },
+    { name: 'Racecadotrilo', category: 'Antidiarreico', dosePerKg: 1.5, frequency: 'cada 8h', maxDose: 300, unit: 'mg', indications: 'Diarrea aguda (antisecretor)', presentations: ['Sobres 10mg', 'Sobres 30mg', 'Cápsulas 100mg'], warnings: ['Seguro en pediatría', 'No altera motilidad'] },
+    { name: 'Probióticos (Lactobacillus)', category: 'Probiótico', dosePerKg: 0, frequency: 'según producto', maxDose: 0, unit: 'UFC', indications: 'Diarrea, prevención diarrea por antibióticos', presentations: ['Sobres', 'Gotas', 'Cápsulas'], warnings: ['Evitar en inmunodeprimidos graves'] },
+
+    // ANTIPARASITARIOS
+    { name: 'Mebendazol', category: 'Antiparasitario', dosePerKg: 0, frequency: '100mg cada 12h x 3 días', maxDose: 200, unit: 'mg/día', indications: 'Oxiuros, áscaris, uncinarias', presentations: ['Comprimidos 100mg', 'Suspensión 100mg/5mL'], warnings: ['Contraindicado <2 años', 'Puede repetir en 2 semanas'] },
+    { name: 'Albendazol', category: 'Antiparasitario', dosePerKg: 7.5, frequency: 'cada 12h o 400mg dosis única', maxDose: 800, unit: 'mg', indications: 'Helmintiasis intestinal, Giardia, hidatidosis', presentations: ['Comprimidos 200mg', 'Comprimidos 400mg', 'Suspensión 100mg/5mL'], warnings: ['Contraindicado <2 años', 'Hepatotoxicidad (uso prolongado)'] },
+    { name: 'Metronidazol (antiparasitario)', category: 'Antiparasitario', dosePerKg: 15, frequency: 'cada 8h x 7-10 días', maxDose: 2000, unit: 'mg', indications: 'Giardiasis, amebiasis', presentations: ['Suspensión 125mg/5mL', 'Comprimidos 250mg'], warnings: ['Sabor metálico', 'Efecto antabús'] },
+    { name: 'Permetrina (tópica)', category: 'Antiparasitario', dosePerKg: 0, frequency: 'aplicar y lavar tras 10min (piojos) o 8-14h (sarna)', maxDose: 0, unit: 'aplicación', indications: 'Pediculosis, escabiosis', presentations: ['Loción 1%', 'Crema 5%'], warnings: ['Solo uso externo', 'Evitar ojos y mucosas'] },
+
+    // ANTIEMÉTICOS
+    { name: 'Dimenhidrinato', category: 'Antiemético', dosePerKg: 5, frequency: 'cada 6-8h', maxDose: 300, unit: 'mg', indications: 'Cinetosis, náuseas, vómitos', presentations: ['Comprimidos 50mg', 'Supositorios 25mg', 'Supositorios 50mg'], warnings: ['Sedación', 'Efectos anticolinérgicos', '>2 años'] },
+
+    // ANTICONVULSIVANTES Y SEDANTES
+    { name: 'Diazepam', category: 'Benzodiazepina', dosePerKg: 0.3, frequency: 'dosis única rectal/IV', maxDose: 10, unit: 'mg', indications: 'Crisis convulsiva, estatus epiléptico, sedación', presentations: ['Microenemas 5mg', 'Microenemas 10mg', 'Ampollas 10mg/2mL'], warnings: ['Depresión respiratoria', 'Monitorización', 'Equipo de reanimación'] },
+    { name: 'Midazolam', category: 'Benzodiazepina', dosePerKg: 0.2, frequency: 'dosis única bucal/nasal/IV', maxDose: 10, unit: 'mg', indications: 'Crisis convulsiva, sedación procedimientos', presentations: ['Solución bucal 2.5mg/5mg/7.5mg/10mg', 'Ampollas 5mg/mL'], warnings: ['Depresión respiratoria', 'Amnesia anterógrada'] },
+    { name: 'Fenobarbital', category: 'Antiepiléptico', dosePerKg: 5, frequency: 'cada 24h', maxDose: 300, unit: 'mg', indications: 'Epilepsia, convulsiones neonatales', presentations: ['Comprimidos 15mg', 'Comprimidos 100mg', 'Ampollas 200mg/mL'], warnings: ['Sedación', 'Inducción enzimática', 'Dependencia'] },
+    { name: 'Ácido Valproico', category: 'Antiepiléptico', dosePerKg: 30, frequency: 'cada 8-12h', maxDose: 3000, unit: 'mg', indications: 'Epilepsia generalizada, crisis ausencia, migraña', presentations: ['Jarabe 200mg/5mL', 'Comprimidos 200mg', 'Comprimidos 500mg crono'], warnings: ['Hepatotoxicidad', 'Pancreatitis', 'Teratógeno'] },
+    { name: 'Levetiracetam', category: 'Antiepiléptico', dosePerKg: 30, frequency: 'cada 12h', maxDose: 3000, unit: 'mg', indications: 'Epilepsia focal y generalizada', presentations: ['Solución 100mg/mL', 'Comprimidos 500mg', 'Comprimidos 1000mg'], warnings: ['Irritabilidad', 'Cambios conductuales'] },
+    { name: 'Carbamazepina', category: 'Antiepiléptico', dosePerKg: 20, frequency: 'cada 8-12h', maxDose: 1200, unit: 'mg', indications: 'Epilepsia focal, neuralgia del trigémino', presentations: ['Suspensión 100mg/5mL', 'Comprimidos 200mg', 'Comprimidos 400mg retard'], warnings: ['Síndrome Stevens-Johnson (HLA-B*1502)', 'Hiponatremia', 'Inducción enzimática'] },
+
+    // SUPLEMENTOS Y VITAMINAS
+    { name: 'Hierro elemental', category: 'Suplemento', dosePerKg: 3, frequency: 'cada 24h', maxDose: 200, unit: 'mg Fe elemental', indications: 'Anemia ferropénica, profilaxis', presentations: ['Gotas sulfato ferroso', 'Jarabe gluconato ferroso', 'Comprimidos'], warnings: ['Tinción dental', 'Estreñimiento', 'Tomar con vitamina C'] },
+    { name: 'Vitamina D (Colecalciferol)', category: 'Vitamina', dosePerKg: 0, frequency: '400-1000 UI/día', maxDose: 4000, unit: 'UI', indications: 'Prevención raquitismo, déficit vitamina D', presentations: ['Gotas 400 UI/gota', 'Gotas 2000 UI/mL', 'Ampollas 25000 UI'], warnings: ['Hipercalcemia en sobredosis', 'Monitorizar niveles'] },
+    { name: 'Vitamina K (Fitomenadiona)', category: 'Vitamina', dosePerKg: 0, frequency: '1mg IM al nacer', maxDose: 10, unit: 'mg', indications: 'Profilaxis enfermedad hemorrágica del RN, intoxicación por anticoagulantes', presentations: ['Ampollas 2mg/0.2mL', 'Ampollas 10mg/mL'], warnings: ['Anafilaxia (IV rápida)', 'Preferir IM en neonatos'] },
+    { name: 'Calcio (carbonato)', category: 'Suplemento', dosePerKg: 50, frequency: 'cada 8-12h', maxDose: 2500, unit: 'mg Ca elemental', indications: 'Hipocalcemia, suplementación', presentations: ['Comprimidos 500mg', 'Comprimidos masticables', 'Jarabe'], warnings: ['Estreñimiento', 'Interacciones medicamentosas'] },
+    { name: 'Zinc', category: 'Suplemento', dosePerKg: 0, frequency: '10-20mg/día x 10-14 días', maxDose: 40, unit: 'mg', indications: 'Diarrea aguda (reduce duración)', presentations: ['Jarabe 20mg/5mL', 'Comprimidos dispersables 20mg'], warnings: ['Náuseas si se toma en ayunas'] }
+];
+
+let currentDrugSelection = null;
+
+function initPediatricDosing() {
+    renderPedDrugTable();
+    populatePedDrugSelect();
+}
+
+function renderPedDrugTable() {
+    const tbody = document.getElementById('ped-drug-table');
+    if (!tbody) return;
+    
+    tbody.innerHTML = PEDIATRIC_DRUGS.map(drug => `
+        <tr class="bg-white border-b hover:bg-gray-50">
+            <td class="px-4 py-3 font-medium text-gray-900">${drug.name}</td>
+            <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">${drug.category}</span></td>
+            <td class="px-4 py-3">${drug.dosePerKg > 0 ? drug.dosePerKg + ' ' + drug.unit + '/kg/día' : 'Ver posología'}</td>
+            <td class="px-4 py-3">${drug.frequency}</td>
+            <td class="px-4 py-3">${drug.maxDose > 0 ? drug.maxDose + ' ' + drug.unit : '-'}</td>
+        </tr>
+    `).join('');
+}
+
+function populatePedDrugSelect(filterText = '') {
+    const select = document.getElementById('ped-drug-select');
+    if (!select) return;
+    
+    const filtered = filterText 
+        ? PEDIATRIC_DRUGS.filter(d => d.name.toLowerCase().includes(filterText.toLowerCase()) || d.category.toLowerCase().includes(filterText.toLowerCase()))
+        : PEDIATRIC_DRUGS;
+    
+    select.innerHTML = '<option value="">Seleccionar medicamento...</option>' + 
+        filtered.map((drug, idx) => `<option value="${PEDIATRIC_DRUGS.indexOf(drug)}">${drug.name} (${drug.category})</option>`).join('');
+}
+
+window.filterPedDrugs = function() {
+    const search = document.getElementById('ped-drug-search').value;
+    populatePedDrugSelect(search);
+}
+
+window.selectPedDrug = function() {
+    const select = document.getElementById('ped-drug-select');
+    const idx = parseInt(select.value);
+    if (!isNaN(idx) && PEDIATRIC_DRUGS[idx]) {
+        currentDrugSelection = PEDIATRIC_DRUGS[idx];
+    } else {
+        currentDrugSelection = null;
+    }
+}
+
+window.calculatePedDose = function() {
+    const weight = parseFloat(document.getElementById('ped-weight').value);
+    const ageYears = parseInt(document.getElementById('ped-age-years').value) || 0;
+    const ageMonths = parseInt(document.getElementById('ped-age-months').value) || 0;
+    
+    if (!weight || weight <= 0) {
+        showToast('Por favor ingresa el peso del paciente', 'error');
+        return;
+    }
+    
+    if (!currentDrugSelection) {
+        showToast('Por favor selecciona un medicamento', 'error');
+        return;
+    }
+    
+    const drug = currentDrugSelection;
+    const resultDiv = document.getElementById('ped-result');
+    const noResultDiv = document.getElementById('ped-no-result');
+    
+    // Calculate doses
+    let dailyDose = drug.dosePerKg * weight;
+    if (drug.maxDose > 0 && dailyDose > drug.maxDose) {
+        dailyDose = drug.maxDose;
+    }
+    
+    // Determine frequency divisor
+    let freqDivisor = 1;
+    if (drug.frequency.includes('cada 4h')) freqDivisor = 6;
+    else if (drug.frequency.includes('cada 6h')) freqDivisor = 4;
+    else if (drug.frequency.includes('cada 8h')) freqDivisor = 3;
+    else if (drug.frequency.includes('cada 12h')) freqDivisor = 2;
+    else if (drug.frequency.includes('cada 24h')) freqDivisor = 1;
+    
+    const dosePerAdmin = dailyDose / freqDivisor;
+    
+    // Update UI
+    document.getElementById('ped-result-drug').textContent = drug.name;
+    document.getElementById('ped-result-indication').textContent = drug.indications;
+    document.getElementById('ped-result-dose').textContent = drug.dosePerKg > 0 ? `${dosePerAdmin.toFixed(1)} ${drug.unit}` : 'Ver posología específica';
+    document.getElementById('ped-result-daily').textContent = drug.dosePerKg > 0 ? `${dailyDose.toFixed(1)} ${drug.unit}/día` : 'Variable';
+    document.getElementById('ped-result-posology').textContent = `Administrar ${drug.frequency}. Peso: ${weight} kg, Edad: ${ageYears}a ${ageMonths}m`;
+    
+    // Warnings
+    const warningsUl = document.getElementById('ped-result-warnings');
+    warningsUl.innerHTML = drug.warnings.map(w => `<li>${w}</li>`).join('');
+    
+    // Presentations
+    const presDiv = document.getElementById('ped-result-presentations');
+    presDiv.innerHTML = drug.presentations.map(p => `<span class="inline-block bg-gray-200 rounded px-2 py-1 text-xs mr-2 mb-2">${p}</span>`).join('');
+    
+    resultDiv.classList.remove('hidden');
+    noResultDiv.classList.add('hidden');
+}
+
+// ===== IMC CALCULATOR =====
+window.calculateIMC = function() {
+    const weight = parseFloat(document.getElementById('imc-weight').value);
+    const height = parseFloat(document.getElementById('imc-height').value);
+    
+    if (!weight || !height || weight <= 0 || height <= 0) {
+        showToast('Por favor ingresa peso y altura válidos', 'error');
+        return;
+    }
+    
+    const heightM = height / 100;
+    const imc = weight / (heightM * heightM);
+    
+    let category = '';
+    let categoryClass = '';
+    
+    if (imc < 18.5) {
+        category = 'Bajo peso';
+        categoryClass = 'text-blue-600';
+    } else if (imc < 25) {
+        category = 'Peso normal';
+        categoryClass = 'text-green-600';
+    } else if (imc < 30) {
+        category = 'Sobrepeso';
+        categoryClass = 'text-yellow-600';
+    } else if (imc < 35) {
+        category = 'Obesidad grado I';
+        categoryClass = 'text-orange-600';
+    } else if (imc < 40) {
+        category = 'Obesidad grado II';
+        categoryClass = 'text-red-600';
+    } else {
+        category = 'Obesidad grado III (mórbida)';
+        categoryClass = 'text-red-800';
+    }
+    
+    document.getElementById('imc-value').textContent = imc.toFixed(1);
+    document.getElementById('imc-value').className = `text-5xl font-bold ${categoryClass}`;
+    document.getElementById('imc-category').textContent = category;
+    document.getElementById('imc-category').className = `text-lg ${categoryClass}`;
+    document.getElementById('imc-result').classList.remove('hidden');
+}
+
+// ===== CREATININE CLEARANCE CALCULATOR =====
+window.calculateClearance = function() {
+    const age = parseFloat(document.getElementById('clcr-age').value);
+    const weight = parseFloat(document.getElementById('clcr-weight').value);
+    const creatinine = parseFloat(document.getElementById('clcr-creatinine').value);
+    const sex = document.getElementById('clcr-sex').value;
+    
+    if (!age || !weight || !creatinine || age <= 0 || weight <= 0 || creatinine <= 0) {
+        showToast('Por favor completa todos los campos correctamente', 'error');
+        return;
+    }
+    
+    // Cockcroft-Gault formula
+    let clCr = ((140 - age) * weight) / (72 * creatinine);
+    if (sex === 'female') {
+        clCr *= 0.85;
+    }
+    
+    // Determine CKD stage
+    let stage = '';
+    if (clCr >= 90) {
+        stage = 'G1 - Normal';
+    } else if (clCr >= 60) {
+        stage = 'G2 - Leve ↓';
+    } else if (clCr >= 45) {
+        stage = 'G3a - Leve-Mod';
+    } else if (clCr >= 30) {
+        stage = 'G3b - Mod-Grave';
+    } else if (clCr >= 15) {
+        stage = 'G4 - Grave ↓';
+    } else {
+        stage = 'G5 - Fallo renal';
+    }
+    
+    document.getElementById('clcr-cg').textContent = clCr.toFixed(1);
+    document.getElementById('clcr-stage').textContent = stage;
+    document.getElementById('clcr-result').classList.remove('hidden');
 }
